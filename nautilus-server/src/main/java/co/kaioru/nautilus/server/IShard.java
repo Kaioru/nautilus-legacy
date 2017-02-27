@@ -1,12 +1,14 @@
 package co.kaioru.nautilus.server;
 
-import java.rmi.Remote;
+import co.kaioru.nautilus.core.config.IConfigurableRemote;
+import co.kaioru.nautilus.server.config.ShardConfig;
+
 import java.rmi.RemoteException;
 import java.util.Collection;
 
-public interface IShard<C extends ICluster> extends Remote {
+public interface IShard<C extends ICluster, CO extends ShardConfig> extends IConfigurableRemote<CO>, IRemote<CO> {
 
-	Collection<C> getClusters() throws RemoteException;
+	Collection<? extends C> getClusters() throws RemoteException;
 
 	void registerCluster(C cluster) throws RemoteException;
 
