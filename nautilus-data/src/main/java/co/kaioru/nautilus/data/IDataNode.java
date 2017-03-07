@@ -66,6 +66,16 @@ public interface IDataNode {
 		return getPoint(new Point());
 	}
 
+	long getLong(long def);
+
+	default long getLong(String child, long def) {
+		return getChild(child).getLong(def);
+	}
+
+	default long getLong(String child) {
+		return getLong(child, 0);
+	}
+
 	String getStringCur(String def);
 
 	default String getString(String child, String def) {
