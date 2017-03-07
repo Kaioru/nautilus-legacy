@@ -1,10 +1,13 @@
 package co.kaioru.nautilus.data;
 
 import java.awt.*;
+import java.util.Collection;
 
 public interface IDataNode {
 
 	IDataNode getChild(String child);
+
+	Collection<IDataNode> getChilds();
 
 	boolean getBoolean(boolean def);
 

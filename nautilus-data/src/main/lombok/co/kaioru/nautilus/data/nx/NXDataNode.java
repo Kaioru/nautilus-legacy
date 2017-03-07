@@ -1,10 +1,12 @@
 package co.kaioru.nautilus.data.nx;
 
 import co.kaioru.nautilus.data.IDataNode;
+import com.google.common.collect.Lists;
 import us.aaronweiss.pkgnx.NXFile;
 import us.aaronweiss.pkgnx.NXNode;
 
 import java.awt.*;
+import java.util.Collection;
 
 public class NXDataNode implements IDataNode {
 
@@ -26,6 +28,13 @@ public class NXDataNode implements IDataNode {
 		for (String split : splits)
 			target = target.getChild(split);
 		return new NXDataNode(target);
+	}
+
+	@Override
+	public Collection<IDataNode> getChilds() {
+		Collection<IDataNode> nodes = Lists.newArrayList();
+		node.forEach(n -> nodes.add(new NXDataNode(n)));
+		return nodes;
 	}
 
 	private Object get(Object def) {
