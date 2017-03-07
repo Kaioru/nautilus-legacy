@@ -43,6 +43,7 @@ public class NXDataNode implements IDataNode {
 	}
 
 	private Object get(Object def) {
+		if (node == null) return def;
 		Object obj = node.get();
 		if (obj != null)
 			return obj;
