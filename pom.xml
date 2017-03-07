@@ -8,8 +8,8 @@
 
 	<modules>
 		<module>nautilus-core</module>
+		<module>nautilus-data</module>
 		<module>nautilus-server</module>
-		
 		<module>nautilus-world</module>
 		<module>nautilus-login</module>
 	</modules>
