@@ -1,6 +1,8 @@
 package co.kaioru.nautilus.data.template;
 
-public interface ITemplate {
+import java.io.Serializable;
+
+public interface ITemplate extends Serializable {
 
 	int getTemplateID();
 
