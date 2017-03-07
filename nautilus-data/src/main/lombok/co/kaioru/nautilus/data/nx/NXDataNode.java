@@ -31,10 +31,15 @@ public class NXDataNode implements IDataNode {
 	}
 
 	@Override
-	public Collection<IDataNode> getChilds() {
+	public Collection<IDataNode> getChildren() {
 		Collection<IDataNode> nodes = Lists.newArrayList();
 		node.forEach(n -> nodes.add(new NXDataNode(n)));
 		return nodes;
+	}
+
+	@Override
+	public String getName() {
+		return node.getName();
 	}
 
 	private Object get(Object def) {

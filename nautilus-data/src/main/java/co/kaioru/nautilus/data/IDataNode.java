@@ -7,7 +7,9 @@ public interface IDataNode {
 
 	IDataNode getChild(String child);
 
-	Collection<IDataNode> getChilds();
+	Collection<IDataNode> getChildren();
+
+	String getName();
 
 	boolean getBoolean(boolean def);
 
