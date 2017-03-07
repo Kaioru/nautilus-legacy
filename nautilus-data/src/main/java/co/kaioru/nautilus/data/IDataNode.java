@@ -1,8 +1,10 @@
 package co.kaioru.nautilus.data;
 
-public interface IDataNode<T extends IDataNode> {
+import java.awt.*;
 
-	IDataNode<T> getChild(String child);
+public interface IDataNode {
+
+	IDataNode getChild(String child);
 
 	boolean getBoolean(boolean def);
 
@@ -42,6 +44,26 @@ public interface IDataNode<T extends IDataNode> {
 
 	default int getInt(String child) {
 		return getInt(child, 0);
+	}
+
+	double getDouble(double def);
+
+	default double getDouble(String child, double def) {
+		return getChild(child).getDouble(def);
+	}
+
+	default double getDouble(String child) {
+		return getDouble(child, 0);
+	}
+
+	Point getPoint(Point def);
+
+	default Point getPoint(String child, Point def) {
+		return getChild(child).getPoint(def);
+	}
+
+	default Point getPoint(String child) {
+		return getPoint(new Point());
 	}
 
 	String getStringCur(String def);
