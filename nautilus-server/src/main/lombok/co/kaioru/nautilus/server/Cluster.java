@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.rmi.AlreadyBoundException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,13 +16,12 @@ import java.util.Set;
 @Getter
 @Setter
 @Slf4j
-public class Cluster<S extends IShard, CO extends ClusterConfig> implements ICluster<S, CO>, Runnable {
+public class Cluster<S extends IShard, CO extends ClusterConfig> extends Daemon<CO> implements ICluster<S, CO>, Runnable {
 
-	private final CO config;
 	private final Set<S> shards;
 
 	public Cluster(CO config) {
-		this.config = config;
+		super(config);
 		this.shards = Sets.newConcurrentHashSet();
 	}
 
@@ -55,19 +53,14 @@ public class Cluster<S extends IShard, CO extends ClusterConfig> implements IClu
 	}
 
 	@Override
-	public CO getConfig() throws RemoteException {
-		return config;
-	}
-
-	@Override
-	public void ping(IRemote remote) throws RemoteException {
+	public void ping(IDaemon remote) throws RemoteException {
 		log.debug("Received ping from Shard {}", remote.getConfig().getName());
 	}
 
 	@Override
 	public void run() {
 		try {
-			Remote stub = UnicastRemoteObject.exportObject(this, 0);
+			java.rmi.Remote stub = UnicastRemoteObject.exportObject(this, 0);
 			Registry registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
 
 			registry.bind(getConfig().getName(), stub);
