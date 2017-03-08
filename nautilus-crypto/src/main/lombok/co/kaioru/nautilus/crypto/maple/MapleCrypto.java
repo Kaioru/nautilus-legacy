@@ -1,6 +1,7 @@
 package co.kaioru.nautilus.crypto.maple;
 
 import co.kaioru.nautilus.crypto.ICrypto;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -44,7 +45,7 @@ public class MapleCrypto implements ICrypto {
 	private static final ThreadLocal<Cipher> cipher = ThreadLocal.withInitial(() -> {
 
 		try {
-			Cipher c = Cipher.getInstance("AES");
+			Cipher c = Cipher.getInstance("AES", new BouncyCastleProvider());
 			c.init(Cipher.ENCRYPT_MODE, KEY_SPEC);
 			return c;
 		} catch (Throwable t) {

@@ -11,5 +11,12 @@
 
 	<artifactId>nautilus-crypto</artifactId>
 
+	<dependencies>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.56</version>
+		</dependency>
+	</dependencies>
 
 </project>
