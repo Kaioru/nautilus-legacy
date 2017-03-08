@@ -93,8 +93,6 @@ public class FieldTemplate implements ITemplate {
 
 		this.mobCapacityMin = mobCapacity;
 		this.mobCapacityMax = mobCapacity * 2;
-
-		System.out.println("Field " + templateID + " : " + mobCapacityMin + " - " + mobCapacityMax + " monsters.");
 	}
 
 }
