@@ -1,17 +1,20 @@
 package co.kaioru.nautilus.server;
 
 import co.kaioru.nautilus.server.config.ClusterConfig;
+import co.kaioru.nautilus.server.task.CrossServerPingTask;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.rmi.AlreadyBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
@@ -39,16 +42,16 @@ public class Cluster<S extends IShard, CO extends ClusterConfig> extends Daemon<
 				}
 			})
 			.count() > 0) {
-			getShards().add(shard);
-			shard.getClusters().add(this);
-			log.info("Registered Shard {} to registry", shard.getConfig().getName());
+			if (!getShards().contains(shard)) {
+				getShards().add(shard);
+				log.info("Registered Shard {} to registry", shard.getConfig().getName());
+			}
 		}
 	}
 
 	@Override
 	public void deregisterShard(S shard) throws RemoteException {
 		getShards().remove(shard);
-		shard.getClusters().remove(this);
 		log.info("Deregistered Shard {} from registry", shard.getConfig().getName());
 	}
 
@@ -60,11 +63,27 @@ public class Cluster<S extends IShard, CO extends ClusterConfig> extends Daemon<
 	@Override
 	public void run() {
 		try {
-			java.rmi.Remote stub = UnicastRemoteObject.exportObject(this, 0);
+			Remote stub = UnicastRemoteObject.exportObject(this, 0);
 			Registry registry = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
 
 			registry.bind(getConfig().getName(), stub);
 			log.info("Started Cluster {}", getConfig().getName());
+
+			getExecutor().scheduleAtFixedRate(
+				new CrossServerPingTask<>(this, this.getShards()),
+				5, 3,
+				TimeUnit.SECONDS
+			);
+
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				getExecutor().shutdown();
+				getShards().forEach(s -> {
+					try {
+						s.deregisterCluster(this);
+					} catch (RemoteException e) {
+					}
+				});
+			}));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (AlreadyBoundException e) {

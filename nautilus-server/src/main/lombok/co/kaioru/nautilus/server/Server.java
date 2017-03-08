@@ -32,6 +32,8 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 	@Override
 	public void run() {
+		super.run();
+
 		this.bossGroup = new NioEventLoopGroup();
 		this.workerGroup = new NioEventLoopGroup();
 
@@ -90,7 +92,6 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 				.channel();
 
 			log.info("{} started on {}:{}", getConfig().getName(), getConfig().getHost(), getConfig().getPort());
-			super.run();
 			channel.closeFuture().sync();
 		} catch (InterruptedException e) {
 			e.printStackTrace();

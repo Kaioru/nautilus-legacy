@@ -1,18 +1,18 @@
 package co.kaioru.nautilus.server;
 
 import co.kaioru.nautilus.server.config.ShardConfig;
+import co.kaioru.nautilus.server.task.CrossServerPingTask;
+import co.kaioru.nautilus.server.task.ShardReconnectTask;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
@@ -28,14 +28,16 @@ public class Shard<C extends ICluster, CO extends ShardConfig> extends Daemon<CO
 
 	@Override
 	public void registerCluster(C cluster) throws RemoteException {
+		getClusters().add(cluster);
 		cluster.registerShard(this);
 		log.info("Registered Cluster {} to registry", cluster.getConfig().getName());
 	}
 
 	@Override
 	public void deregisterCluster(C cluster) throws RemoteException {
+		getClusters().remove(cluster);
 		cluster.deregisterShard(this);
-		log.info("Registered Cluster {} to registry", cluster.getConfig().getName());
+		log.debug("Deregistered Cluster {} from registry", cluster.getConfig().getName());
 	}
 
 	@Override
@@ -46,23 +48,28 @@ public class Shard<C extends ICluster, CO extends ShardConfig> extends Daemon<CO
 	@Override
 	public void run() {
 		try {
-			java.rmi.Remote stub = UnicastRemoteObject.exportObject(this, 0);
+			Remote stub = UnicastRemoteObject.exportObject(this, 0);
 
-			getConfig().getClusters().forEach(c -> {
-				try {
-					Registry registry = LocateRegistry.getRegistry(c.getHost(), Registry.REGISTRY_PORT);
-					C cluster = (C) registry.lookup(c.getName());
+			getExecutor().scheduleAtFixedRate(
+				new CrossServerPingTask<>(this, this.getClusters()),
+				5, 3,
+				TimeUnit.SECONDS
+			);
+			getExecutor().scheduleAtFixedRate(
+				new ShardReconnectTask(this, stub, this.getConfig().getClusters()),
+				1, 3,
+				TimeUnit.SECONDS
+			);
 
-					registry.bind(getConfig().getName(), stub);
-					registerCluster(cluster);
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				} catch (AlreadyBoundException e) {
-					e.printStackTrace();
-				} catch (NotBoundException e) {
-					e.printStackTrace();
-				}
-			});
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				getExecutor().shutdown();
+				getClusters().forEach(s -> {
+					try {
+						s.deregisterShard(this);
+					} catch (RemoteException e) {
+					}
+				});
+			}));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
