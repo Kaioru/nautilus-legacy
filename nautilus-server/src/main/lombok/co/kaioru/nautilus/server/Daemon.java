@@ -1,7 +1,6 @@
 package co.kaioru.nautilus.server;
 
 import co.kaioru.nautilus.server.config.RemoteConfig;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import lombok.Getter;
