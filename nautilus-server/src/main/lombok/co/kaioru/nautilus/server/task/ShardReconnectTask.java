@@ -3,7 +3,6 @@ package co.kaioru.nautilus.server.task;
 import co.kaioru.nautilus.server.ICluster;
 import co.kaioru.nautilus.server.Shard;
 import co.kaioru.nautilus.server.config.RemoteConfig;
-import co.kaioru.nautilus.server.config.ShardConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import java.rmi.NotBoundException;
@@ -12,7 +11,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 public class ShardReconnectTask implements Runnable {
