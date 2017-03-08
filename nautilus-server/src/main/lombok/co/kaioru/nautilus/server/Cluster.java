@@ -85,9 +85,9 @@ public class Cluster<S extends IShard, CO extends ClusterConfig> extends Daemon<
 				});
 			}));
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			log.error("Failed to export the remote stub");
 		} catch (AlreadyBoundException e) {
-			e.printStackTrace();
+			log.error("Failed to create a registry as the port is already bound");
 		}
 	}
 

@@ -5,9 +5,7 @@ import co.kaioru.nautilus.server.Shard;
 import co.kaioru.nautilus.server.config.RemoteConfig;
 import lombok.extern.slf4j.Slf4j;
 
-import java.rmi.NotBoundException;
 import java.rmi.Remote;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Set;
@@ -37,8 +35,8 @@ public class ShardReconnectTask implements Runnable {
 						registry.rebind(shard.getConfig().getName(), stub);
 						shard.registerCluster(cluster);
 					}
-				} catch (RemoteException e) {
-				} catch (NotBoundException e) {
+				} catch (Exception e) {
+					log.debug("Failed to register to cluster {}", c.getName());
 				}
 			});
 	}

@@ -71,7 +71,7 @@ public class Shard<C extends ICluster, CO extends ShardConfig> extends Daemon<CO
 				});
 			}));
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			log.error("Failed to export the remote stub");
 		}
 	}
 
