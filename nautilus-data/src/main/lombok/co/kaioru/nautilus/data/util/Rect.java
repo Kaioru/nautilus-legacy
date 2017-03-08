@@ -28,6 +28,10 @@ public class Rect {
 		this.bottom = yBottom;
 	}
 
+	public static Rect copy(Rect rect) {
+		return new Rect(rect.left, rect.top, rect.right, rect.bottom);
+	}
+
 	public void inflate(int dx, int dy) {
 		this.left -= dx;
 		this.right += dx;
@@ -41,10 +45,6 @@ public class Rect {
 
 	public boolean contains(int x, int y) {
 		return left <= x && x <= right && top <= y && y <= bottom;
-	}
-
-	public static Rect copy(Rect rect) {
-		return new Rect(rect.left, rect.top, rect.right, rect.bottom);
 	}
 
 }

@@ -2,7 +2,6 @@ package co.kaioru.nautilus.server.game.packet;
 
 import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
-import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.game.client.Client;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;

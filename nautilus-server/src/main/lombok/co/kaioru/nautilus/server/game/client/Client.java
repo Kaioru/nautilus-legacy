@@ -17,11 +17,10 @@ public class Client {
 	public static final AttributeKey<Client> CLIENT_KEY = AttributeKey.valueOf("C");
 
 	private final Channel channel;
+	private final ReentrantLock lock;
 	private byte[] siv;
 	private byte[] riv;
 	private int storedLength = -1;
-
-	private final ReentrantLock lock;
 
 	public Client(Channel channel, byte[] siv, byte[] riv) {
 		this.channel = channel;

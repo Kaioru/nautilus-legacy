@@ -119,7 +119,7 @@ public class PacketBuilder {
 			if (data.length > offset) {
 				trim();
 			}
-			return new Packet( data);
+			return new Packet(data);
 		}
 		return null;
 	}

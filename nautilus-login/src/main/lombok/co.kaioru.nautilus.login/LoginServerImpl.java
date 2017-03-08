@@ -2,7 +2,6 @@ package co.kaioru.nautilus.login;
 
 import co.kaioru.nautilus.server.game.LoginServer;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
-import co.kaioru.nautilus.server.game.config.WorldConfig;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;

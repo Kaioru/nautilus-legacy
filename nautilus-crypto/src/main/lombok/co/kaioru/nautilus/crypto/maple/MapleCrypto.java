@@ -3,9 +3,7 @@ package co.kaioru.nautilus.crypto.maple;
 import co.kaioru.nautilus.crypto.ICrypto;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 
 import static co.kaioru.nautilus.crypto.maple.MapleBitTool.multiplyBytes;
@@ -43,7 +41,6 @@ public class MapleCrypto implements ICrypto {
 
 	private static final SecretKeySpec KEY_SPEC = new SecretKeySpec(AES_KEY, "AES");
 	private static final ThreadLocal<Cipher> cipher = ThreadLocal.withInitial(() -> {
-
 		try {
 			Cipher c = Cipher.getInstance("AES", new BouncyCastleProvider());
 			c.init(Cipher.ENCRYPT_MODE, KEY_SPEC);
@@ -51,7 +48,6 @@ public class MapleCrypto implements ICrypto {
 		} catch (Throwable t) {
 			throw new RuntimeException("Error initialising AES.", t);
 		}
-
 	});
 
 	private final short gVersion, sVersion, rVersion;
@@ -60,6 +56,12 @@ public class MapleCrypto implements ICrypto {
 		gVersion = version;
 		sVersion = (short) ((((0xFFFF - gVersion) >> 8) & 0xFF) | (((0xFFFF - gVersion) << 8) & 0xFF00));
 		rVersion = (short) (((gVersion >> 8) & 0xFF) | ((gVersion << 8) & 0xFF00));
+	}
+
+	public static int getLength(int delta) {
+		int a = ((delta >>> 16) ^ (delta & 0xFFFF));
+		a = ((a << 8) & 0xFF00) | ((a >>> 8) & 0xFF);
+		return a;
 	}
 
 	@Override
@@ -109,12 +111,6 @@ public class MapleCrypto implements ICrypto {
 		ret[2] = (byte) ((c >>> 8) & 0xFF);
 		ret[3] = (byte) (c & 0xFF);
 		return ret;
-	}
-
-	public static int getLength(int delta) {
-		int a = ((delta >>> 16) ^ (delta & 0xFFFF));
-		a = ((a << 8) & 0xFF00) | ((a >>> 8) & 0xFF);
-		return a;
 	}
 
 	public boolean check(byte[] delta, byte[] gamma) {
