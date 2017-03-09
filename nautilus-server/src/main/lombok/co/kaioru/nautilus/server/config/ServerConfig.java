@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class ServerConfig extends ShardConfig {
 
+	private short mapleMajorVersion;
+	private short mapleMinorVersion;
 	private int port;
 
 }

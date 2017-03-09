@@ -57,9 +57,10 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 								@Override
 								public void channelActive(ChannelHandlerContext ctx) {
-									byte[] siv = {82, 48, (byte) (Math.random() * 255), 115};
 									byte[] riv = {70, 114, (byte) (Math.random() * 255), 82};
-									short majorVersion = 62, minorVersion = 1;
+									byte[] siv = {82, 48, (byte) (Math.random() * 255), 115};
+									short majorVersion = getConfig().getMapleMajorVersion();
+									short minorVersion = getConfig().getMapleMinorVersion();
 									Channel channel = ctx.channel();
 									Client client = new Client(channel, riv, siv);
 
