@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.server;
 
+import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
@@ -111,6 +112,14 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 			workerGroup.shutdownGracefully();
 			bossGroup.shutdownGracefully();
 		}
+	}
+
+	public void registerPacketHandler(IValue<Integer> operation, IPacketHandler handler) {
+		handlers.put(operation.getValue(), handler);
+	}
+
+	public void deregisterPacketHandler(IPacketHandler handler) {
+		handlers.remove(handler);
 	}
 
 }
