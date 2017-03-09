@@ -63,8 +63,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									Channel channel = ctx.channel();
 									Client client = new Client(channel, riv, siv);
 
-									new PacketBuilder()
-										.writeShort(0x0E)
+									PacketBuilder.create(0x0E)
 										.writeShort(majorVersion)
 										.writeMapleString(String.valueOf(minorVersion))
 										.writeBytes(riv)

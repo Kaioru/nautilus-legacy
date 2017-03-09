@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.server.game.packet;
 
+import co.kaioru.nautilus.core.util.IValue;
 import io.netty.channel.Channel;
 
 import java.awt.*;
@@ -12,10 +13,21 @@ public class PacketBuilder {
 	private int offset;
 	private byte[] data;
 
-
-	public PacketBuilder() {
+	private PacketBuilder() {
 		offset = 0;
 		data = new byte[32];
+	}
+
+	public static PacketBuilder create() {
+		return new PacketBuilder();
+	}
+
+	public static PacketBuilder create(int operation) {
+		return create().writeShort(operation);
+	}
+
+	public static PacketBuilder create(IValue<Integer> operation) {
+		return create().writeShort(operation.getValue());
 	}
 
 	private void expand(int size) {
