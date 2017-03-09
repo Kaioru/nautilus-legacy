@@ -84,7 +84,8 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									IPacketHandler handler = handlers.get(operation);
 
 									if (handler != null) {
-										handler.handle(client, reader);
+										if (handler.validate(client))
+											handler.handle(client, reader);
 										log.debug("Handled operation code {} with {}",
 											operation,
 											handler.getClass().getSimpleName());
