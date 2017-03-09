@@ -63,9 +63,9 @@ public class Shard<C extends ICluster, CO extends ShardConfig> extends Daemon<CO
 
 			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 				getExecutor().shutdown();
-				getClusters().forEach(s -> {
+				getClusters().forEach(c -> {
 					try {
-						s.deregisterShard(this);
+						this.deregisterCluster(c);
 					} catch (RemoteException e) {
 					}
 				});

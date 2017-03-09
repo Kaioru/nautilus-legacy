@@ -79,7 +79,7 @@ public class Cluster<S extends IShard, CO extends ClusterConfig> extends Daemon<
 				getExecutor().shutdown();
 				getShards().forEach(s -> {
 					try {
-						s.deregisterCluster(this);
+						this.deregisterShard(s);
 					} catch (RemoteException e) {
 					}
 				});
