@@ -30,8 +30,8 @@ public class WorldClusterImpl extends WorldCluster {
 			WorldConfig config = new Gson().fromJson(br, WorldConfig.class);
 			WorldClusterImpl cluster = new WorldClusterImpl(config);
 
-			cluster.run();
 			setInstance(cluster);
+			cluster.run();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			log.error("Failed to find {}..\r\n{}", configPath, new WorldConfig().toJson());

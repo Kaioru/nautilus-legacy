@@ -30,8 +30,8 @@ public class LoginServerImpl extends LoginServer {
 			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
 			LoginServerImpl server = new LoginServerImpl(config);
 
-			server.run();
 			setInstance(server);
+			server.run();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			log.error("Failed to find {}..\r\n{}", configPath, new LoginConfig().toJson());
