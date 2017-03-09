@@ -5,10 +5,8 @@ import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
 import co.kaioru.nautilus.server.game.client.Client;
-import co.kaioru.nautilus.server.game.packet.Packet;
-import co.kaioru.nautilus.server.game.packet.PacketBuilder;
-import co.kaioru.nautilus.server.game.packet.PacketDecoder;
-import co.kaioru.nautilus.server.game.packet.PacketEncoder;
+import co.kaioru.nautilus.server.game.packet.*;
+import com.google.common.collect.Maps;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -18,6 +16,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @Slf4j
@@ -26,16 +26,20 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 	private Channel channel;
 	private EventLoopGroup bossGroup, workerGroup;
 
+	private Map<Integer, IPacketHandler> handlers;
+
 	public Server(CO config) {
 		super(config);
+
+		this.handlers = Maps.newConcurrentMap();
 	}
 
 	@Override
 	public void run() {
 		super.run();
 
-		this.bossGroup = new NioEventLoopGroup();
-		this.workerGroup = new NioEventLoopGroup();
+		this.bossGroup = new NioEventLoopGroup(2, getExecutor());
+		this.workerGroup = new NioEventLoopGroup(4, getExecutor());
 
 		try {
 			this.channel = new ServerBootstrap()
@@ -56,7 +60,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									byte[] riv = {70, 114, (byte) (Math.random() * 255), 82};
 									short majorVersion = 62, minorVersion = 1;
 									Channel channel = ctx.channel();
-									Client client = new Client(channel, siv, riv);
+									Client client = new Client(channel, riv, siv);
 
 									new PacketBuilder()
 										.writeShort(0x0E)
@@ -73,11 +77,18 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 								@Override
 								public void channelRead(ChannelHandlerContext ctx, Object msg) {
-									Packet packet = (Packet) msg;
-									Channel channel = ctx.channel();
-									short header = packet.readShort();
+									PacketReader reader = new PacketReader((Packet) msg);
+									Client client = ctx.channel().attr(Client.CLIENT_KEY).get();
 
-									log.info("Packet with operation code: {} received", header);
+									short operation = reader.readShort();
+									IPacketHandler handler = handlers.get(operation);
+
+									if (handler != null) {
+										handler.handle(client, reader);
+										log.debug("Handled operation code {} with {}",
+											operation,
+											handler.getClass().getSimpleName());
+									} else log.warn("No packet handlers found for operation code {}", operation);
 								}
 
 							},

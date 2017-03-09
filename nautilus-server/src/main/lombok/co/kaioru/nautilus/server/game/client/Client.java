@@ -18,11 +18,11 @@ public class Client {
 
 	private final Channel channel;
 	private final ReentrantLock lock;
-	private byte[] siv;
 	private byte[] riv;
+	private byte[] siv;
 	private int storedLength = -1;
 
-	public Client(Channel channel, byte[] siv, byte[] riv) {
+	public Client(Channel channel, byte[] riv, byte[] siv) {
 		this.channel = channel;
 		this.siv = siv;
 		this.riv = riv;
