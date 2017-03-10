@@ -13,6 +13,7 @@
 		<module>nautilus-server</module>
 		<module>nautilus-world</module>
 		<module>nautilus-login</module>
+		<module>nautilus-all</module>
 	</modules>
 
 	<properties>
