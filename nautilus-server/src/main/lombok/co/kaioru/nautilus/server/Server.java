@@ -5,8 +5,8 @@ import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
-import co.kaioru.nautilus.server.game.client.Client;
 import co.kaioru.nautilus.server.game.packet.*;
+import co.kaioru.nautilus.server.game.user.RemoteUser;
 import com.google.common.collect.Maps;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -62,7 +62,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									short majorVersion = getConfig().getMapleMajorVersion();
 									short minorVersion = getConfig().getMapleMinorVersion();
 									Channel channel = ctx.channel();
-									Client client = new Client(channel, riv, siv);
+									RemoteUser remoteUser = new RemoteUser(channel, riv, siv);
 
 									PacketBuilder.create(0x0E)
 										.writeShort(majorVersion)
@@ -72,21 +72,21 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 										.writeByte((byte) 8)
 										.buildAndFlush(channel);
 
-									channel.attr(Client.CLIENT_KEY).set(client);
-									channel.attr(Client.CRYPTO_KEY).set(new MapleCrypto(majorVersion));
+									channel.attr(RemoteUser.USER_KEY).set(remoteUser);
+									channel.attr(RemoteUser.CRYPTO_KEY).set(new MapleCrypto(majorVersion));
 								}
 
 								@Override
 								public void channelRead(ChannelHandlerContext ctx, Object msg) {
 									PacketReader reader = new PacketReader((Packet) msg);
-									Client client = ctx.channel().attr(Client.CLIENT_KEY).get();
+									RemoteUser remoteUser = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
 									short operation = reader.readShort();
 									IPacketHandler handler = handlers.get(operation);
 
 									if (handler != null) {
-										if (handler.validate(client))
-											handler.handle(client, reader);
+										if (handler.validate(remoteUser))
+											handler.handle(remoteUser, reader);
 										log.debug("Handled operation code {} with {}",
 											operation,
 											handler.getClass().getSimpleName());

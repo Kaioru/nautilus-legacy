@@ -2,7 +2,7 @@ package co.kaioru.nautilus.server.game.packet;
 
 import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
-import co.kaioru.nautilus.server.game.client.Client;
+import co.kaioru.nautilus.server.game.user.RemoteUser;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -19,22 +19,22 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
 
 	@Override
 	protected void encode(ChannelHandlerContext chc, Packet p, ByteBuf bb) throws Exception {
-		MapleCrypto mapleCrypto = chc.channel().attr(Client.CRYPTO_KEY).get();
-		Client client = chc.channel().attr(Client.CLIENT_KEY).get();
+		MapleCrypto mapleCrypto = chc.channel().attr(RemoteUser.CRYPTO_KEY).get();
+		RemoteUser remoteUser = chc.channel().attr(RemoteUser.USER_KEY).get();
 		byte[] payload = p.getPayload();
 
-		if (client != null) {
-			byte[] iv = client.getSiv();
+		if (remoteUser != null) {
+			byte[] iv = remoteUser.getSiv();
 			byte[] head = mapleCrypto.getHeader(payload.length, iv);
 
 			crypto.encrypt(payload);
 
-			client.getLock().lock();
+			remoteUser.getLock().lock();
 			try {
 				mapleCrypto.encrypt(payload, iv);
-				client.setSiv(mapleCrypto.generateSeed(iv));
+				remoteUser.setSiv(mapleCrypto.generateSeed(iv));
 			} finally {
-				client.getLock().unlock();
+				remoteUser.getLock().unlock();
 			}
 
 			bb.writeBytes(head);
