@@ -13,14 +13,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>co.kaioru.nautilus</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>nautilus-core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>co.kaioru.nautilus</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>nautilus-crypto</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
