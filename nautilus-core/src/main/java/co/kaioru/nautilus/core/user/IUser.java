@@ -1,7 +1,7 @@
 package co.kaioru.nautilus.core.user;
 
-import co.kaioru.nautilus.core.model.Account;
-import co.kaioru.nautilus.core.model.Character;
+import co.kaioru.nautilus.orm.Account;
+import co.kaioru.nautilus.orm.Character;
 
 public interface IUser {
 
