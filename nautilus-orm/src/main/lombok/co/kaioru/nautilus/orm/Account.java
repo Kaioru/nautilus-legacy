@@ -11,7 +11,7 @@ import java.util.List;
 @Table(name = "accounts")
 public class Account {
 
-	@Column(nullable = false)
+	@Column(unique = true, nullable = false)
 	private Long identity;
 
 	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
