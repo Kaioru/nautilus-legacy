@@ -1,5 +1,6 @@
-package co.kaioru.nautilus.orm;
+package co.kaioru.nautilus.orm.account;
 
+import co.kaioru.nautilus.orm.Model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

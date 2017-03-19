@@ -1,7 +1,7 @@
 package co.kaioru.nautilus.core.user;
 
-import co.kaioru.nautilus.orm.Account;
-import co.kaioru.nautilus.orm.Character;
+import co.kaioru.nautilus.orm.account.Account;
+import co.kaioru.nautilus.orm.account.Character;
 import lombok.Getter;
 import lombok.Setter;
 
