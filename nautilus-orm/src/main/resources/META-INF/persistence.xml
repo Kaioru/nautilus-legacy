@@ -5,6 +5,7 @@
 	<persistence-unit name="co.kaioru.nautilus.orm.jpa">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+		<class>co.kaioru.nautilus.orm.auth.Identity</class>
 		<class>co.kaioru.nautilus.orm.account.Account</class>
 		<class>co.kaioru.nautilus.orm.account.Character</class>
 	</persistence-unit>
