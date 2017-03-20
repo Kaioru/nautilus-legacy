@@ -13,15 +13,14 @@ import java.util.Optional;
 
 public class BasicAuthenticator implements IAuthenticator {
 
-	private final EntityManagerFactory entityManagerFactory;
+	private final EntityManager entityManager;
 
-	public BasicAuthenticator(EntityManagerFactory entityManagerFactory) {
-		this.entityManagerFactory = entityManagerFactory;
+	public BasicAuthenticator(EntityManager entityManager) {
+		this.entityManager = entityManager;
 	}
 
 	@Override
 	public Optional<Account> authenticate(String username, String password) {
-		@Cleanup EntityManager entityManager = entityManagerFactory.createEntityManager();
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Identity> identityCriteriaQuery = builder.createQuery(Identity.class);
 		Root<Identity> identityRoot = identityCriteriaQuery.from(Identity.class);
