@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Map;
 
 @Getter
@@ -29,9 +30,8 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 	private Map<Integer, IPacketHandler> handlers;
 
-	public Server(CO config) {
-		super(config);
-
+	public Server(CO config, EntityManagerFactory entityManagerFactory) {
+		super(config, entityManagerFactory);
 		this.handlers = Maps.newConcurrentMap();
 	}
 

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.EntityManagerFactory;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -19,10 +20,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Shard<C extends ICluster, CO extends ShardConfig> extends Daemon<CO> implements IShard<C, CO>, Runnable {
 
+	private final EntityManagerFactory entityManagerFactory;
 	private final Set<C> clusters;
 
-	public Shard(CO config) {
+	public Shard(CO config, EntityManagerFactory entityManagerFactory) {
 		super(config);
+		this.entityManagerFactory = entityManagerFactory;
 		this.clusters = Sets.newConcurrentHashSet();
 	}
 
