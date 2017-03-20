@@ -21,6 +21,7 @@ buildNumber.properties
 # End of https://www.gitignore.io/api/intellij,maven
 
 ### Nautilus ###
+/lib/
 *.wz
 *.nx
 *.bin
