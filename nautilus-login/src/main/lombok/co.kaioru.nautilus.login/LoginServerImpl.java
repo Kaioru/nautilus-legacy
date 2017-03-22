@@ -1,6 +1,7 @@
 package co.kaioru.nautilus.login;
 
 import co.kaioru.nautilus.login.handler.CheckPasswordHandler;
+import co.kaioru.nautilus.login.handler.WorldInfoRequestHandler;
 import co.kaioru.nautilus.login.packet.LoginRecvOperations;
 import co.kaioru.nautilus.orm.auth.BasicAuthenticator;
 import co.kaioru.nautilus.server.game.LoginServer;
@@ -45,6 +46,7 @@ public class LoginServerImpl extends LoginServer {
 
 			server.registerPacketHandler(LoginRecvOperations.CHECK_PASSWORD, new CheckPasswordHandler(
 				new BasicAuthenticator(entityManagerFactory.createEntityManager())));
+			server.registerPacketHandler(LoginRecvOperations.WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
 
 			setInstance(server);
 			server.run();
