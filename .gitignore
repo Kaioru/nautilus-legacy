@@ -26,5 +26,7 @@ buildNumber.properties
 *.nx
 *.bin
 *.yaml
-config.json
-database.properties
+*.json
+*.properties
+!*.example.*
+!*.test.*

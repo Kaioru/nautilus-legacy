@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Cacheable
 @Table(name = "accounts")
 public class Account extends Model {
 
