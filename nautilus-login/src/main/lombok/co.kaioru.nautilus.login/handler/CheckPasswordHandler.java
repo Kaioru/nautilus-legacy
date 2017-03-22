@@ -1,14 +1,13 @@
 package co.kaioru.nautilus.login.handler;
 
+import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Account;
 import co.kaioru.nautilus.orm.auth.IAuthenticator;
 import co.kaioru.nautilus.server.game.packet.IPacketHandler;
 import co.kaioru.nautilus.server.game.packet.PacketReader;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import com.google.common.base.Joiner;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 public class CheckPasswordHandler implements IPacketHandler {
@@ -30,11 +29,36 @@ public class CheckPasswordHandler implements IPacketHandler {
 			Account account = accountOptional.get();
 
 			remoteUser.setAccount(account);
-		} else {
-
+			remoteUser.sendPacket(LoginStructures.getCheckPasswordSuccess(account));
+			return;
 		}
 
-		remoteUser.getChannel().writeAndFlush(LoginStructures.getCheckPasswordResult((byte) 13));
+		remoteUser.sendPacket(LoginStructures.getCheckPasswordResult(CheckPasswordResult.INVALID_PASSWORD));
+	}
+
+	public enum CheckPasswordResult implements IValue<Byte> {
+
+		ENABLE_BUTTON((byte) 1),
+		BLOCKED_ACCOUNT((byte) 3),
+		INVALID_PASSWORD((byte) 4),
+		INVALID_USERNAME((byte) 5),
+		SYSTEM_ERROR((byte) 6),
+		ALREADY_LOGGED_IN((byte) 7),
+		CONNECTION_ERROR((byte) 8),
+		SYSTEM_ERROR_2((byte) 9),
+		TOO_MANY_REQUESTS((byte) 10);
+
+		private final byte value;
+
+		CheckPasswordResult(byte value) {
+			this.value = value;
+		}
+
+		@Override
+		public Byte getValue() {
+			return value;
+		}
+
 	}
 
 }

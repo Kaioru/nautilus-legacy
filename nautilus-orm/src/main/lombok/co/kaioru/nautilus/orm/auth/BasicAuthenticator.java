@@ -20,6 +20,8 @@ public class BasicAuthenticator implements IAuthenticator {
 
 	@Override
 	public Optional<Account> authenticate(String username, String password) {
+		Account account = null;
+
 		try {
 			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 			CriteriaQuery<Identity> identityCriteriaQuery = builder.createQuery(Identity.class);
@@ -31,8 +33,6 @@ public class BasicAuthenticator implements IAuthenticator {
 			Identity identity = entityManager.createQuery(identityCriteriaQuery).getSingleResult();
 
 			if (identity.getPassword().equals(password)) {
-				Account account;
-
 				try {
 					CriteriaQuery<Account> accountCriteriaQuery = builder.createQuery(Account.class);
 					Root<Account> accountRoot = accountCriteriaQuery.from(Account.class);
@@ -49,11 +49,9 @@ public class BasicAuthenticator implements IAuthenticator {
 					entityManager.persist(account);
 					entityManager.getTransaction().commit();
 				}
-
-				return Optional.of(account);
-			} else throw new NoResultException();
+			}
 		} finally {
-			return Optional.empty();
+			return Optional.ofNullable(account);
 		}
 	}
 
