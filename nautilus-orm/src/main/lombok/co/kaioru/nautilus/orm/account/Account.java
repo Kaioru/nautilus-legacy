@@ -18,7 +18,7 @@ public class Account extends Model {
 	@Column(unique = true, nullable = false)
 	private int identity;
 
-	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Character> characters = Lists.newArrayList();
 
 }
