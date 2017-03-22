@@ -17,7 +17,7 @@ public class ORMTest {
 	public void test() throws IOException {
 		Properties properties = new Properties();
 
-		properties.load(getClass().getResourceAsStream("database.properties"));
+		properties.load(getClass().getResourceAsStream("database.test.properties"));
 
 		EntityManagerFactory entityManagerFactory = Persistence
 			.createEntityManagerFactory("co.kaioru.nautilus.orm.jpa", properties);

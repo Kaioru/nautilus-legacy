@@ -26,3 +26,4 @@ buildNumber.properties
 *.nx
 *.bin
 config.json
+database.properties
