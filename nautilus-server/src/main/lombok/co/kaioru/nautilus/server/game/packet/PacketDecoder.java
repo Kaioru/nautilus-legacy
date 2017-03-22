@@ -19,33 +19,31 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
 	@Override
 	protected void decode(ChannelHandlerContext chc, ByteBuf in, List<Object> out) throws Exception {
-		MapleCrypto mapleCrypto = chc.channel().attr(RemoteUser.CRYPTO_KEY).get();
-		RemoteUser remoteUser = chc.channel().attr(RemoteUser.USER_KEY).get();
+		MapleCrypto mapleCrypto = chc.channel().attr(RemoteUser.RECV_CRYPTO_KEY).get();
 
-		if (remoteUser != null) {
-			byte[] iv = remoteUser.getRiv();
-			if (remoteUser.getStoredLength() == -1) {
-				if (in.readableBytes() >= 4) {
-					int h = in.readInt();
-					if (!mapleCrypto.check(h, iv)) {
-						remoteUser.getChannel().close();
-						return;
-					}
-					remoteUser.setStoredLength(mapleCrypto.getLength(h));
-				} else {
+		if (mapleCrypto != null) {
+			if (in.readableBytes() >= 4) {
+				int header = in.readInt();
+
+				if (!mapleCrypto.checkData(header)) {
+					chc.close();
 					return;
 				}
-			}
-			if (in.readableBytes() >= remoteUser.getStoredLength()) {
-				byte[] dec = new byte[remoteUser.getStoredLength()];
-				in.readBytes(dec);
-				remoteUser.setStoredLength(-1);
 
-				dec = mapleCrypto.encrypt(dec, iv);
-				remoteUser.setRiv(mapleCrypto.generateSeed(iv));
+				int length = mapleCrypto.getLength(header);
+				byte[] payload = new byte[length];
 
-				dec = crypto.decrypt(dec);
-				out.add(new Packet(dec));
+				if (in.readableBytes() >= length) {
+					in.readBytes(payload);
+					payload = mapleCrypto.encrypt(payload);
+					payload = crypto.decrypt(payload);
+					final StringBuilder builder = new StringBuilder();
+					for(byte b : payload) {
+						builder.append(String.format("%02x ", b));
+					}
+					System.out.println(builder.toString());
+					out.add(new Packet(payload));
+				}
 			}
 		}
 	}

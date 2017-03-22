@@ -2,10 +2,9 @@ package co.kaioru.nautilus.orm.auth;
 
 import co.kaioru.nautilus.orm.account.Account;
 import co.kaioru.nautilus.orm.account.Account_;
-import lombok.Cleanup;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -21,26 +20,28 @@ public class BasicAuthenticator implements IAuthenticator {
 
 	@Override
 	public Optional<Account> authenticate(String username, String password) {
-		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Identity> identityCriteriaQuery = builder.createQuery(Identity.class);
-		Root<Identity> identityRoot = identityCriteriaQuery.from(Identity.class);
+		try {
+			CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+			CriteriaQuery<Identity> identityCriteriaQuery = builder.createQuery(Identity.class);
+			Root<Identity> identityRoot = identityCriteriaQuery.from(Identity.class);
 
-		identityCriteriaQuery.select(identityRoot);
-		identityCriteriaQuery.where(builder.equal(identityRoot.get(Identity_.username), username));
+			identityCriteriaQuery.select(identityRoot);
+			identityCriteriaQuery.where(builder.equal(identityRoot.get(Identity_.username), username));
 
-		Identity identity = entityManager.createQuery(identityCriteriaQuery).getSingleResult();
+			Identity identity = entityManager.createQuery(identityCriteriaQuery).getSingleResult();
 
-		if (identity != null) {
 			if (identity.getPassword().equals(password)) {
-				CriteriaQuery<Account> accountCriteriaQuery = builder.createQuery(Account.class);
-				Root<Account> accountRoot = accountCriteriaQuery.from(Account.class);
+				Account account;
 
-				accountCriteriaQuery.select(accountRoot);
-				accountCriteriaQuery.where(builder.equal(accountRoot.get(Account_.identity), identity.getId()));
+				try {
+					CriteriaQuery<Account> accountCriteriaQuery = builder.createQuery(Account.class);
+					Root<Account> accountRoot = accountCriteriaQuery.from(Account.class);
 
-				Account account = entityManager.createQuery(accountCriteriaQuery).getSingleResult();
+					accountCriteriaQuery.select(accountRoot);
+					accountCriteriaQuery.where(builder.equal(accountRoot.get(Account_.identity), identity.getId()));
 
-				if (account == null) {
+					account = entityManager.createQuery(accountCriteriaQuery).getSingleResult();
+				} catch (NoResultException e) {
 					account = new Account();
 					account.setIdentity(identity.getId());
 
@@ -50,10 +51,10 @@ public class BasicAuthenticator implements IAuthenticator {
 				}
 
 				return Optional.of(account);
-			}
+			} else throw new NoResultException();
+		} finally {
+			return Optional.empty();
 		}
-
-		return Optional.empty();
 	}
 
 }

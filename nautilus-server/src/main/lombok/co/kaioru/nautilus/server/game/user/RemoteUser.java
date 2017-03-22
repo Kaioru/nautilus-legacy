@@ -13,20 +13,15 @@ import java.util.concurrent.locks.ReentrantLock;
 @Setter
 public class RemoteUser extends User {
 
-	public static final AttributeKey<MapleCrypto> CRYPTO_KEY = AttributeKey.valueOf("A");
-	public static final AttributeKey<RemoteUser> USER_KEY = AttributeKey.valueOf("C");
+	public static final AttributeKey<RemoteUser> USER_KEY = AttributeKey.valueOf("USER");
+	public static final AttributeKey<MapleCrypto> RECV_CRYPTO_KEY = AttributeKey.valueOf("RECV");
+	public static final AttributeKey<MapleCrypto> SEND_CRYPTO_KEY = AttributeKey.valueOf("SEND");
 
 	private final Channel channel;
 	private final ReentrantLock lock;
-	private byte[] riv;
-	private byte[] siv;
-	private int storedLength = -1;
 
-	public RemoteUser(Channel channel, byte[] riv, byte[] siv) {
+	public RemoteUser(Channel channel) {
 		this.channel = channel;
-		this.siv = siv;
-		this.riv = riv;
-
 		this.lock = new ReentrantLock(true);
 	}
 

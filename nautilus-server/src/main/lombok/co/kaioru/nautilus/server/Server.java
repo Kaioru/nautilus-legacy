@@ -18,6 +18,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.EntityManagerFactory;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
 @Getter
@@ -39,10 +40,14 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 	public void run() {
 		super.run();
 
-		this.bossGroup = new NioEventLoopGroup(2, getExecutor());
-		this.workerGroup = new NioEventLoopGroup(4, getExecutor());
-
 		try {
+			short majorVersion = getConfig().getMapleMajorVersion();
+			short minorVersion = getConfig().getMapleMinorVersion();
+			ICrypto crypto = new ShandaCrypto();
+
+			this.bossGroup = new NioEventLoopGroup(2, getExecutor());
+			this.workerGroup = new NioEventLoopGroup(4, getExecutor());
+
 			this.channel = new ServerBootstrap()
 				.group(bossGroup, workerGroup)
 				.channel(NioServerSocketChannel.class)
@@ -50,19 +55,25 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 					@Override
 					protected void initChannel(SocketChannel socketChannel) throws Exception {
-						ICrypto crypto = new ShandaCrypto();
 						socketChannel.pipeline().addLast(
 							new PacketDecoder(crypto),
 							new ChannelInboundHandlerAdapter() {
 
 								@Override
-								public void channelActive(ChannelHandlerContext ctx) {
+								public void channelActive(ChannelHandlerContext ctx) throws GeneralSecurityException {
 									byte[] riv = {70, 114, (byte) (Math.random() * 255), 82};
 									byte[] siv = {82, 48, (byte) (Math.random() * 255), 115};
-									short majorVersion = getConfig().getMapleMajorVersion();
-									short minorVersion = getConfig().getMapleMinorVersion();
+									byte[] key = {
+										0x13, 0x00, 0x00, 0x00,
+										0x08, 0x00, 0x00, 0x00,
+										0x06, 0x00, 0x00, 0x00,
+										(byte) 0xB4, 0x00, 0x00, 0x00,
+										0x1B, 0x00, 0x00, 0x00,
+										0x0F, 0x00, 0x00, 0x00,
+										0x33, 0x00, 0x00, 0x00,
+										0x52, 0x00, 0x00, 0x00};
 									Channel channel = ctx.channel();
-									RemoteUser remoteUser = new RemoteUser(channel, riv, siv);
+									RemoteUser remoteUser = new RemoteUser(channel);
 
 									PacketBuilder.create(0x0E)
 										.writeShort(majorVersion)
@@ -73,7 +84,8 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 										.buildAndFlush(channel);
 
 									channel.attr(RemoteUser.USER_KEY).set(remoteUser);
-									channel.attr(RemoteUser.CRYPTO_KEY).set(new MapleCrypto(majorVersion));
+									channel.attr(RemoteUser.RECV_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, riv));
+									channel.attr(RemoteUser.SEND_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, siv));
 								}
 
 								@Override
@@ -81,7 +93,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									PacketReader reader = new PacketReader((Packet) msg);
 									RemoteUser remoteUser = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
-									short operation = reader.readShort();
+									int operation = reader.readShort();
 									IPacketHandler handler = handlers.get(operation);
 
 									if (handler != null) {
@@ -90,7 +102,9 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 										log.debug("Handled operation code {} with {}",
 											operation,
 											handler.getClass().getSimpleName());
-									} else log.warn("No packet handlers found for operation code {}", operation);
+									} else {
+										log.warn("No packet handlers found for operation code {}", operation);
+									}
 								}
 
 							},

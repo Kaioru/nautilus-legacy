@@ -55,6 +55,10 @@ public class PacketBuilder {
 		return this;
 	}
 
+	public PacketBuilder writeByte(int b) {
+		return write(b);
+	}
+
 	public PacketBuilder writeByte(byte b) {
 		return write(b);
 	}

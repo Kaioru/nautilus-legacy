@@ -1,13 +1,18 @@
 package co.kaioru.nautilus.crypto.maple;
 
 import co.kaioru.nautilus.crypto.ICrypto;
+import lombok.Getter;
+import lombok.Setter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.GeneralSecurityException;
 
 import static co.kaioru.nautilus.crypto.maple.MapleBitTool.multiplyBytes;
 
+@Getter
+@Setter
 public class MapleCrypto implements ICrypto {
 
 	private static final int[] SHUFFLE_BYTES = new int[]{0xEC, 0x3F, 0x77, 0xA4, 0x45, 0xD0, 0x71, 0xBF, 0xB7, 0x98, 0x20, 0xFC,
@@ -28,46 +33,24 @@ public class MapleCrypto implements ICrypto {
 		0xD3, 0xAB, 0x91, 0xB9, 0x84, 0x7F, 0x61, 0x1E, 0xCF, 0xC5, 0xD1, 0x56, 0x3D, 0xCA, 0xF4, 0x05,
 		0xC6, 0xE5, 0x08, 0x49};
 
-	private static final byte[] AES_KEY = new byte[]{
-		0x13, 0x00, 0x00, 0x00,
-		0x08, 0x00, 0x00, 0x00,
-		0x06, 0x00, 0x00, 0x00,
-		(byte) 0xB4, 0x00, 0x00, 0x00,
-		0x1B, 0x00, 0x00, 0x00,
-		0x0F, 0x00, 0x00, 0x00,
-		0x33, 0x00, 0x00, 0x00,
-		0x52, 0x00, 0x00, 0x00
-	};
+	private final Cipher cipher;
 
-	private static final SecretKeySpec KEY_SPEC = new SecretKeySpec(AES_KEY, "AES");
-	private static final ThreadLocal<Cipher> cipher = ThreadLocal.withInitial(() -> {
-		try {
-			Cipher c = Cipher.getInstance("AES", new BouncyCastleProvider());
-			c.init(Cipher.ENCRYPT_MODE, KEY_SPEC);
-			return c;
-		} catch (Throwable t) {
-			throw new RuntimeException("Error initialising AES.", t);
-		}
-	});
+	private short gVersion, sVersion, rVersion;
+	private byte[] iv;
 
-	private final short gVersion, sVersion, rVersion;
-
-	public MapleCrypto(short version) {
-		gVersion = version;
-		sVersion = (short) ((((0xFFFF - gVersion) >> 8) & 0xFF) | (((0xFFFF - gVersion) << 8) & 0xFF00));
-		rVersion = (short) (((gVersion >> 8) & 0xFF) | ((gVersion << 8) & 0xFF00));
-	}
-
-	public static int getLength(int delta) {
-		int a = ((delta >>> 16) ^ (delta & 0xFFFF));
-		a = ((a << 8) & 0xFF00) | ((a >>> 8) & 0xFF);
-		return a;
+	public MapleCrypto(short v, byte[] key, byte[] iv) throws GeneralSecurityException {
+		this.gVersion = v;
+		this.sVersion = (short) ((((0xFFFF - v) >> 8) & 0xFF) | (((0xFFFF - v) << 8) & 0xFF00));
+		this.rVersion = (short) (((v >> 8) & 0xFF) | ((v << 8) & 0xFF00));
+		this.cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
+		this.cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
+		this.iv = iv;
 	}
 
 	@Override
 	public byte[] encrypt(byte[]... bytes) {
 		byte[] delta = bytes[0];
-		byte[] gamma = bytes[1];
+		byte[] gamma = getIv();
 
 		int a = delta.length;
 		int b = 0x5B0;
@@ -80,7 +63,10 @@ public class MapleCrypto implements ICrypto {
 			for (int e = c; e < (c + b); e++) {
 				if ((e - c) % d.length == 0) {
 					try {
-						d = cipher.get().doFinal(d);
+						byte[] t = cipher.doFinal(d);
+						for (int j = 0; j < d.length; j++) {
+							d[j] = t[j];
+						}
 					} catch (Exception ex) {
 						ex.printStackTrace(); // may eventually want to remove this
 					}
@@ -91,6 +77,8 @@ public class MapleCrypto implements ICrypto {
 			a -= b;
 			b = 0x5B4;
 		}
+
+		setIv(generateIV(getIv()));
 		return delta;
 	}
 
@@ -99,34 +87,8 @@ public class MapleCrypto implements ICrypto {
 		return new byte[0];
 	}
 
-	public byte[] getHeader(int delta, byte[] gamma) {
-		int a = (gamma[3]) & 0xFF;
-		a |= (gamma[2] << 8) & 0xFF00;
-		a ^= sVersion;
-		int b = ((delta << 8) & 0xFF00) | (delta >>> 8);
-		int c = a ^ b;
-		byte[] ret = new byte[4];
-		ret[0] = (byte) ((a >>> 8) & 0xFF);
-		ret[1] = (byte) (a & 0xFF);
-		ret[2] = (byte) ((c >>> 8) & 0xFF);
-		ret[3] = (byte) (c & 0xFF);
-		return ret;
-	}
-
-	public boolean check(byte[] delta, byte[] gamma) {
-		return ((((delta[0] ^ gamma[2]) & 0xFF) == ((rVersion >> 8) & 0xFF))
-			&& (((delta[1] ^ gamma[3]) & 0xFF) == (rVersion & 0xFF)));
-	}
-
-	public boolean check(int delta, byte[] gamma) {
-		byte[] a = new byte[2];
-		a[0] = (byte) ((delta >> 24) & 0xFF);
-		a[1] = (byte) ((delta >> 16) & 0xFF);
-		return check(a, gamma);
-	}
-
-	public byte[] generateSeed(byte[] iv) {
-		byte[] ret = iv;
+	public byte[] generateIV(byte delta[]) {
+		byte[] ret = delta;
 		int[] nIv = {0xF2, 0x53, 0x50, 0xC6};
 		for (int i = 0; i < 4; i++) {
 			int a = (ret[i] & 0xFF);
@@ -149,6 +111,40 @@ public class MapleCrypto implements ICrypto {
 			ret[i] = (byte) nIv[i];
 		}
 		return ret;
+	}
+
+	public byte[] getHeader(int delta) {
+		byte[] gamma = getIv();
+		int a = (gamma[3]) & 0xFF;
+		a |= (gamma[2] << 8) & 0xFF00;
+		a ^= sVersion;
+		int b = ((delta << 8) & 0xFF00) | (delta >>> 8);
+		int c = a ^ b;
+		byte[] ret = new byte[4];
+		ret[0] = (byte) ((a >>> 8) & 0xFF);
+		ret[1] = (byte) (a & 0xFF);
+		ret[2] = (byte) ((c >>> 8) & 0xFF);
+		ret[3] = (byte) (c & 0xFF);
+		return ret;
+	}
+
+	public static int getLength(int delta) {
+		int a = ((delta >>> 16) ^ (delta & 0xFFFF));
+		a = ((a << 8) & 0xFF00) | ((a >>> 8) & 0xFF);
+		return a;
+	}
+
+	public boolean checkData(byte[] delta) {
+		byte[] gamma = getIv();
+		return ((((delta[0] ^ gamma[2]) & 0xFF) == ((rVersion >> 8) & 0xFF))
+			&& (((delta[1] ^ gamma[3]) & 0xFF) == (rVersion & 0xFF)));
+	}
+
+	public boolean checkData(int delta) {
+		byte[] a = new byte[2];
+		a[0] = (byte) ((delta >> 24) & 0xFF);
+		a[1] = (byte) ((delta >> 16) & 0xFF);
+		return checkData(a);
 	}
 
 }

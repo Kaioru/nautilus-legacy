@@ -1,5 +1,8 @@
 package co.kaioru.nautilus.login;
 
+import co.kaioru.nautilus.login.handler.CheckPasswordHandler;
+import co.kaioru.nautilus.login.packet.LoginRecvOperations;
+import co.kaioru.nautilus.orm.auth.BasicAuthenticator;
 import co.kaioru.nautilus.server.game.LoginServer;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
 import com.google.gson.Gson;
@@ -10,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
@@ -40,6 +42,9 @@ public class LoginServerImpl extends LoginServer {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
 			LoginServerImpl server = new LoginServerImpl(config, entityManagerFactory);
+
+			server.registerPacketHandler(LoginRecvOperations.CHECK_PASSWORD, new CheckPasswordHandler(
+				new BasicAuthenticator(entityManagerFactory.createEntityManager())));
 
 			setInstance(server);
 			server.run();
