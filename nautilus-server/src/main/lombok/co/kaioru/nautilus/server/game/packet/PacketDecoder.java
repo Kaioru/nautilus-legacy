@@ -37,11 +37,6 @@ public class PacketDecoder extends ByteToMessageDecoder {
 					in.readBytes(payload);
 					payload = mapleCrypto.encrypt(payload);
 					payload = crypto.decrypt(payload);
-					final StringBuilder builder = new StringBuilder();
-					for(byte b : payload) {
-						builder.append(String.format("%02x ", b));
-					}
-					System.out.println(builder.toString());
 					out.add(new Packet(payload));
 				}
 			}
