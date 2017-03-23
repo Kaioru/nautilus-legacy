@@ -9,12 +9,13 @@
 	<modules>
 		<module>nautilus-core</module>
 		<module>nautilus-data</module>
+		<module>nautilus-orm</module>
 		<module>nautilus-crypto</module>
 		<module>nautilus-server</module>
 		<module>nautilus-world</module>
 		<module>nautilus-login</module>
 		<module>nautilus-all</module>
-		<module>nautilus-orm</module>
+		<module>nautilus-tiny</module>
 	</modules>
 
 	<properties>
