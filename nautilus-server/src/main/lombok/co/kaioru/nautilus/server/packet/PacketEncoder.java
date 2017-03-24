@@ -1,4 +1,4 @@
-package co.kaioru.nautilus.server.game.packet;
+package co.kaioru.nautilus.server.packet;
 
 import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;

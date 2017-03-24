@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 public abstract class Daemon<CO extends RemoteConfig> implements IDaemon<CO> {
 
 	private final ListeningScheduledExecutorService executor =
-		MoreExecutors.listeningDecorator(Executors.newScheduledThreadPool(32));
+		MoreExecutors.listeningDecorator(Executors.newScheduledThreadPool(16));
 	private final CO config;
 
 	protected Daemon(CO config) {

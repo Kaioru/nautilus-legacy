@@ -2,8 +2,8 @@ package co.kaioru.nautilus.server.game.user;
 
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
-import co.kaioru.nautilus.server.game.packet.Packet;
-import co.kaioru.nautilus.server.game.packet.PacketBuilder;
+import co.kaioru.nautilus.server.packet.IPacket;
+import co.kaioru.nautilus.server.packet.IPacketWriter;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import lombok.Getter;
@@ -20,19 +20,17 @@ public class RemoteUser extends User {
 	public static final AttributeKey<MapleCrypto> SEND_CRYPTO_KEY = AttributeKey.valueOf("SEND");
 
 	private final Channel channel;
-	private final ReentrantLock lock;
 
 	public RemoteUser(Channel channel) {
 		this.channel = channel;
-		this.lock = new ReentrantLock(true);
 	}
 
-	public void sendPacket(Packet packet) {
+	public void sendPacket(IPacket packet) {
 		getChannel().writeAndFlush(packet);
 	}
 
-	public void sendPacket(PacketBuilder builder) {
-		builder.buildAndFlush(getChannel());
+	public void sendPacket(IPacketWriter writer) {
+		writer.buildAndFlush(getChannel());
 	}
 
 }

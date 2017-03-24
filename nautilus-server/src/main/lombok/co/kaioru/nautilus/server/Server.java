@@ -5,7 +5,7 @@ import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
-import co.kaioru.nautilus.server.game.packet.*;
+import co.kaioru.nautilus.server.packet.*;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import com.google.common.collect.Maps;
 import io.netty.bootstrap.ServerBootstrap;
@@ -45,8 +45,8 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 			short minorVersion = getConfig().getMapleMinorVersion();
 			ICrypto crypto = new ShandaCrypto();
 
-			this.bossGroup = new NioEventLoopGroup(2, getExecutor());
-			this.workerGroup = new NioEventLoopGroup(4, getExecutor());
+			this.bossGroup = new NioEventLoopGroup(2);
+			this.workerGroup = new NioEventLoopGroup(4);
 
 			this.channel = new ServerBootstrap()
 				.group(bossGroup, workerGroup)
@@ -77,7 +77,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 									PacketBuilder.create(0x0E)
 										.writeShort(majorVersion)
-										.writeMapleString(String.valueOf(minorVersion))
+										.writeString(String.valueOf(minorVersion))
 										.writeBytes(riv)
 										.writeBytes(siv)
 										.writeByte((byte) 8)
@@ -90,7 +90,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 								@Override
 								public void channelRead(ChannelHandlerContext ctx, Object msg) {
-									PacketReader reader = new PacketReader((Packet) msg);
+									IPacketReader reader = new PacketReader((Packet) msg);
 									RemoteUser remoteUser = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
 									int operation = reader.readShort();

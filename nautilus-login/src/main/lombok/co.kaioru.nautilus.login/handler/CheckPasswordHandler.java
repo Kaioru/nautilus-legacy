@@ -4,9 +4,9 @@ import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Account;
 import co.kaioru.nautilus.orm.auth.IAuthenticator;
-import co.kaioru.nautilus.server.game.packet.IPacketHandler;
-import co.kaioru.nautilus.server.game.packet.PacketReader;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
+import co.kaioru.nautilus.server.packet.IPacketHandler;
+import co.kaioru.nautilus.server.packet.IPacketReader;
 
 import java.util.Optional;
 
@@ -19,21 +19,21 @@ public class CheckPasswordHandler implements IPacketHandler {
 	}
 
 	@Override
-	public void handle(RemoteUser remoteUser, PacketReader reader) {
-		String username = reader.readMapleString();
-		String password = reader.readMapleString();
+	public void handle(RemoteUser user, IPacketReader reader) {
+		String username = reader.readString();
+		String password = reader.readString();
 
 		Optional<Account> accountOptional = authenticator.authenticate(username, password);
 
 		if (accountOptional.isPresent()) {
 			Account account = accountOptional.get();
 
-			remoteUser.setAccount(account);
-			remoteUser.sendPacket(LoginStructures.getCheckPasswordSuccess(account));
+			user.setAccount(account);
+			user.sendPacket(LoginStructures.getCheckPasswordSuccess(account));
 			return;
 		}
 
-		remoteUser.sendPacket(LoginStructures.getCheckPasswordResult(CheckPasswordResult.INVALID_PASSWORD));
+		user.sendPacket(LoginStructures.getCheckPasswordResult(CheckPasswordResult.INVALID_PASSWORD));
 	}
 
 	public enum CheckPasswordResult implements IValue<Byte> {
