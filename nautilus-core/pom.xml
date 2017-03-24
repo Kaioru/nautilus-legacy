@@ -13,9 +13,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>co.kaioru.nautilus</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>nautilus-orm</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

@@ -19,12 +19,17 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>nautilus-crypto</artifactId>
+			<artifactId>nautilus-orm</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>nautilus-data</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>nautilus-crypto</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
