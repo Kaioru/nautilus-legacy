@@ -6,6 +6,9 @@ import io.netty.buffer.Unpooled;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class PacketBuilder implements IPacketWriter {
 
@@ -66,6 +69,12 @@ public class PacketBuilder implements IPacketWriter {
 	public IPacketWriter writeString(String string) {
 		buffer.writeShort(string.length());
 		buffer.writeBytes(string.getBytes(Charset.defaultCharset()));
+		return this;
+	}
+
+	@Override
+	public IPacketWriter write(Consumer<IPacketWriter> consumer) {
+		consumer.accept(this);
 		return this;
 	}
 

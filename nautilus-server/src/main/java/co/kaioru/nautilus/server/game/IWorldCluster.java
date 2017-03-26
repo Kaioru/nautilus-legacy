@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 
 public interface IWorldCluster extends ICluster<IShard, WorldConfig> {
 
-	Supplier<List<ILoginServer>> getLoginServerSupplier() throws RemoteException;
+	List<ILoginServer> getLoginServers() throws RemoteException;
 
-	Supplier<List<IChannelServer>> getChannelServerSupplier() throws RemoteException;
+	List<IChannelServer> getChannelServers() throws RemoteException;
 
 }

@@ -10,6 +10,8 @@ import java.util.UUID;
 @Setter
 public class RemoteConfig extends IConfig {
 
+	private int id;
+
 	private String host;
 	private String name;
 	private UUID uuid;
