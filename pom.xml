@@ -14,6 +14,7 @@
 		<module>nautilus-server</module>
 		<module>nautilus-world</module>
 		<module>nautilus-login</module>
+		<module>nautilus-channel</module>
 		<module>nautilus-all</module>
 		<module>nautilus-tiny</module>
 	</modules>

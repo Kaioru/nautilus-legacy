@@ -5,11 +5,13 @@ import co.kaioru.nautilus.server.IShard;
 import co.kaioru.nautilus.server.game.config.WorldConfig;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 
 public interface IWorldCluster extends ICluster<IShard, WorldConfig> {
 
-	Supplier<Collection<ILoginServer>> getLoginServerSupplier() throws RemoteException;
+	Supplier<List<ILoginServer>> getLoginServerSupplier() throws RemoteException;
+
+	Supplier<List<IChannelServer>> getChannelServerSupplier() throws RemoteException;
 
 }
