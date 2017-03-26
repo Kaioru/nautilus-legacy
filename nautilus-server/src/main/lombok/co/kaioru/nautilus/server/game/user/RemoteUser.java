@@ -2,10 +2,13 @@ package co.kaioru.nautilus.server.game.user;
 
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
+import co.kaioru.nautilus.server.game.IChannelServer;
+import co.kaioru.nautilus.server.game.IWorldCluster;
 import co.kaioru.nautilus.server.packet.IPacket;
 import co.kaioru.nautilus.server.packet.IPacketWriter;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +22,11 @@ public class RemoteUser extends User {
 	public static final AttributeKey<MapleCrypto> RECV_CRYPTO_KEY = AttributeKey.valueOf("RECV");
 	public static final AttributeKey<MapleCrypto> SEND_CRYPTO_KEY = AttributeKey.valueOf("SEND");
 
+	@Getter(AccessLevel.PRIVATE)
 	private final Channel channel;
+
+	private IWorldCluster worldCluster;
+	private IChannelServer channelServer;
 
 	public RemoteUser(Channel channel) {
 		this.channel = channel;
