@@ -8,5 +8,9 @@
 		<class>co.kaioru.nautilus.orm.auth.Identity</class>
 		<class>co.kaioru.nautilus.orm.account.Account</class>
 		<class>co.kaioru.nautilus.orm.account.Character</class>
+		<class>co.kaioru.nautilus.orm.account.item.EquipInventory</class>
+		<class>co.kaioru.nautilus.orm.account.item.BundleInventory</class>
+		<class>co.kaioru.nautilus.orm.account.item.EquipItem</class>
+		<class>co.kaioru.nautilus.orm.account.item.BundleItem</class>
 	</persistence-unit>
 </persistence>
