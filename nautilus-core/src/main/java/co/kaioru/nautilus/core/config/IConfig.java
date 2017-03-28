@@ -6,11 +6,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-public abstract class IConfig implements Serializable {
+public interface IConfig extends Serializable {
 
-	public String toJson() {
+	default String toJson() {
 		return new GsonBuilder()
 			.serializeNulls()
 			.setPrettyPrinting()
