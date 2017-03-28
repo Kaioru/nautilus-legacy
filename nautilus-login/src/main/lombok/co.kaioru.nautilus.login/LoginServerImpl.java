@@ -1,9 +1,6 @@
 package co.kaioru.nautilus.login;
 
-import co.kaioru.nautilus.login.handler.CheckPasswordHandler;
-import co.kaioru.nautilus.login.handler.CheckPinCodeHandler;
-import co.kaioru.nautilus.login.handler.UpdatePinCodeHandler;
-import co.kaioru.nautilus.login.handler.WorldInfoRequestHandler;
+import co.kaioru.nautilus.login.handler.*;
 import co.kaioru.nautilus.orm.auth.BasicAuthenticator;
 import co.kaioru.nautilus.server.game.LoginServer;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
@@ -49,6 +46,7 @@ public class LoginServerImpl extends LoginServer {
 
 			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(new BasicAuthenticator(entityManagerFactory.createEntityManager())));
 			server.registerPacketHandler(WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
+			server.registerPacketHandler(CHECK_USER_LIMIT, new CheckUserLimitHandler());
 			server.registerPacketHandler(CHECK_PIN_CODE, new CheckPinCodeHandler());
 			server.registerPacketHandler(UPDATE_PIN_CODE, new UpdatePinCodeHandler());
 			server.registerPacketHandler(WORLD_REQUEST, new WorldInfoRequestHandler());

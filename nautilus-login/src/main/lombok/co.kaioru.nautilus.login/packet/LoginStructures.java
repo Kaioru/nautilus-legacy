@@ -47,6 +47,12 @@ public class LoginStructures {
 			.build();
 	}
 
+	public static IPacket getCheckUserLimitResult(IValue<Byte> result) {
+		return PacketBuilder.create(LoginSendOperations.CHECK_USER_LIMIT_RESULT)
+			.writeByte(result.getValue())
+			.build();
+	}
+
 	public static IPacket getWorldInfoResult(IWorldCluster world) throws RemoteException {
 		WorldConfig config = world.getConfig();
 		List<IChannelServer> channels = world.getChannelServers();
