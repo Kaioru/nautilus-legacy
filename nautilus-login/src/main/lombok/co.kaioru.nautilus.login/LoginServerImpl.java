@@ -45,6 +45,7 @@ public class LoginServerImpl extends LoginServer {
 			LoginServerImpl server = new LoginServerImpl(config, entityManagerFactory);
 
 			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(new BasicAuthenticator(entityManagerFactory.createEntityManager())));
+			server.registerPacketHandler(GUEST_ID_LOGIN, new GuestIDLoginHandler());
 			server.registerPacketHandler(WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
 			server.registerPacketHandler(CHECK_USER_LIMIT, new CheckUserLimitHandler());
 			server.registerPacketHandler(CHECK_PIN_CODE, new CheckPinCodeHandler());

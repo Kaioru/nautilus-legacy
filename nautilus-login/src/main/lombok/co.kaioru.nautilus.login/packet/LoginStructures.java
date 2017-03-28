@@ -22,6 +22,13 @@ public class LoginStructures {
 			.build();
 	}
 
+	public static IPacket getGuestLoginResult(IValue<Byte> result) {
+		return PacketBuilder.create(LoginSendOperations.GUEST_LOGIN_RESULT)
+			.writeByte(result.getValue())
+			.writeByte(0)
+			.build();
+	}
+
 	public static IPacket getCheckPasswordSuccess(Account account) {
 		return PacketBuilder.create(LoginSendOperations.CHECK_PASSWORD_RESULT)
 			.writeByte(0)

@@ -5,6 +5,7 @@ import co.kaioru.nautilus.core.util.IValue;
 public enum LoginRecvOperations implements IValue<Integer> {
 
 	CHECK_PASSWORD(0x01),
+	GUEST_ID_LOGIN(0x02),
 	WORLD_INFO_REQUEST(0x04),
 	SELECT_WORLD(0x05),
 	CHECK_USER_LIMIT(0x06),
