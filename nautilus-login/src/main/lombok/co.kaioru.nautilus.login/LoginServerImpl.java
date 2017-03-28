@@ -1,8 +1,9 @@
 package co.kaioru.nautilus.login;
 
 import co.kaioru.nautilus.login.handler.CheckPasswordHandler;
+import co.kaioru.nautilus.login.handler.CheckPinCodeHandler;
+import co.kaioru.nautilus.login.handler.UpdatePinCodeHandler;
 import co.kaioru.nautilus.login.handler.WorldInfoRequestHandler;
-import co.kaioru.nautilus.login.packet.LoginRecvOperations;
 import co.kaioru.nautilus.orm.auth.BasicAuthenticator;
 import co.kaioru.nautilus.server.game.LoginServer;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
@@ -17,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+
+import static co.kaioru.nautilus.login.packet.LoginRecvOperations.*;
 
 @Slf4j
 public class LoginServerImpl extends LoginServer {
@@ -44,9 +47,11 @@ public class LoginServerImpl extends LoginServer {
 			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
 			LoginServerImpl server = new LoginServerImpl(config, entityManagerFactory);
 
-			server.registerPacketHandler(LoginRecvOperations.CHECK_PASSWORD, new CheckPasswordHandler(
-				new BasicAuthenticator(entityManagerFactory.createEntityManager())));
-			server.registerPacketHandler(LoginRecvOperations.WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
+			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(new BasicAuthenticator(entityManagerFactory.createEntityManager())));
+			server.registerPacketHandler(WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
+			server.registerPacketHandler(CHECK_PIN_CODE, new CheckPinCodeHandler());
+			server.registerPacketHandler(UPDATE_PIN_CODE, new UpdatePinCodeHandler());
+			server.registerPacketHandler(WORLD_REQUEST, new WorldInfoRequestHandler());
 
 			setInstance(server);
 			server.run();

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class RemoteConfig extends IConfig {
+public class RemoteConfig implements IConfig {
 
 	private int id;
 

@@ -38,7 +38,12 @@ public class LoginStructures {
 			.writeLong(0)
 			.writeLong(0)
 			.writeInt(0)
-			.writeShort(0)
+			.build();
+	}
+
+	public static IPacket getCheckPINCodeResult(IValue<Byte> result) {
+		return PacketBuilder.create(LoginSendOperations.CHECK_PIN_CODE_RESULT)
+			.writeByte(result.getValue())
 			.build();
 	}
 
