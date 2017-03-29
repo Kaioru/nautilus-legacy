@@ -50,7 +50,11 @@ public class LoginServerImpl extends LoginServer {
 			server.registerPacketHandler(CHECK_USER_LIMIT, new CheckUserLimitHandler());
 			server.registerPacketHandler(CHECK_PIN_CODE, new CheckPinCodeHandler());
 			server.registerPacketHandler(UPDATE_PIN_CODE, new UpdatePinCodeHandler());
+			server.registerPacketHandler(SELECT_WORLD, new SelectWorldHandler());
 			server.registerPacketHandler(WORLD_REQUEST, new WorldInfoRequestHandler());
+			server.registerPacketHandler(LOGOUT_WORLD, new LogoutWorldHandler());
+			server.registerPacketHandler(CHECK_DUPLICATED_ID, new CheckDuplicatedIDHandler());
+			server.registerPacketHandler(CREATE_NEW_CHARACTER, new CreateNewCharacterHandler(entityManagerFactory.createEntityManager()));
 
 			setInstance(server);
 			server.run();

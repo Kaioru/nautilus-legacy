@@ -19,6 +19,18 @@ public class Character extends Model {
 	@ManyToOne
 	private Account account;
 
+	@Column
+	private int world;
+
+	@Column
+	private String name;
+
+	@Column
+	private byte gender, skin;
+
+	@Column
+	private int face, hair;
+
 	@OneToOne(mappedBy = "character", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	private EquipInventory
 		equippedInventory = new EquipInventory(),

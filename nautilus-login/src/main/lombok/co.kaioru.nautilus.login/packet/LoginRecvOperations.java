@@ -11,7 +11,11 @@ public enum LoginRecvOperations implements IValue<Integer> {
 	CHECK_USER_LIMIT(0x06),
 	CHECK_PIN_CODE(0x09),
 	UPDATE_PIN_CODE(0x0A),
-	WORLD_REQUEST(0x0B);
+	WORLD_REQUEST(0x0B),
+	LOGOUT_WORLD(0x0C),
+	CHECK_DUPLICATED_ID(0x15),
+	CREATE_NEW_CHARACTER(0x16),
+	DELETE_CHARACTER(0x17);
 
 	private final int value;
 

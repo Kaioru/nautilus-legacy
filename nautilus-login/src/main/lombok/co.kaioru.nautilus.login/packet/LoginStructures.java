@@ -102,4 +102,26 @@ public class LoginStructures {
 			.build();
 	}
 
+	// TODO
+	public static IPacket getSelectWorldSuccess(Account account) {
+		return PacketBuilder.create(LoginSendOperations.SELECT_WORLD_RESULT)
+			.writeBool(false)
+			.writeByte(0)
+			.writeInt(3)
+			.build();
+	}
+
+	public static IPacket getCheckDuplicatedIdResult(String name, IValue<Byte> result) {
+		return PacketBuilder.create(LoginSendOperations.CHECK_DUPLICATED_ID_RESULT)
+			.writeString(name)
+			.writeByte(result.getValue())
+			.build();
+	}
+
+	public static IPacket getCreateNewCharacterFailed() {
+		return PacketBuilder.create(LoginSendOperations.CREATE_NEW_CHARACTER_RESULT)
+			.writeBool(true)
+			.build();
+	}
+
 }
