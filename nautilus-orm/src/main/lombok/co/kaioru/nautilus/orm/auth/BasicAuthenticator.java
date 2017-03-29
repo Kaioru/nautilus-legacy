@@ -46,7 +46,7 @@ public class BasicAuthenticator implements IAuthenticator {
 					account.setIdentity(identity.getId());
 
 					entityManager.getTransaction().begin();
-					entityManager.persist(account);
+					account = entityManager.merge(account);
 					entityManager.getTransaction().commit();
 				}
 			}

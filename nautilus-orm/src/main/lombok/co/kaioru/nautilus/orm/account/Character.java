@@ -5,17 +5,21 @@ import co.kaioru.nautilus.orm.account.item.BundleInventory;
 import co.kaioru.nautilus.orm.account.item.EquipInventory;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "characters")
 public class Character extends Model {
 
-	@Setter(AccessLevel.NONE)
+	@Setter(AccessLevel.PRIVATE)
 	@ManyToOne
 	private Account account;
 
@@ -30,17 +34,23 @@ public class Character extends Model {
 
 	@Column
 	private int face, hair;
-
-	@OneToOne(mappedBy = "character", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+/*
+	@Fetch(FetchMode.SELECT)
+	@OneToOne(mappedBy = "character", fetch = FetchType.EAGER, orphanRemoval = true)
 	private EquipInventory
-		equippedInventory = new EquipInventory(),
-		equipInventory = new EquipInventory();
+		equippedInventory = new EquipInventory(this),
+		equipInventory = new EquipInventory(this);
 
-	@OneToOne(mappedBy = "character", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@Fetch(FetchMode.SELECT)
+	@OneToOne(mappedBy = "character", fetch = FetchType.EAGER, orphanRemoval = true)
 	private BundleInventory
-		useInventory = new BundleInventory(),
-		setupInventory = new BundleInventory(),
-		etcInventory = new BundleInventory(),
-		cashInventory = new BundleInventory();
+		useInventory = new BundleInventory(this),
+		setupInventory = new BundleInventory(this),
+		etcInventory = new BundleInventory(this),
+		cashInventory = new BundleInventory(this);
+*/
+	public Character(Account account) {
+		this.account = account;
+	}
 
 }

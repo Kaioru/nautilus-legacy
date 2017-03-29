@@ -2,10 +2,12 @@ package co.kaioru.nautilus.login.packet;
 
 import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.orm.account.Account;
+import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
 import co.kaioru.nautilus.server.game.config.WorldConfig;
 import co.kaioru.nautilus.server.packet.IPacket;
+import co.kaioru.nautilus.server.packet.IPacketWriter;
 import co.kaioru.nautilus.server.packet.PacketBuilder;
 
 import java.rmi.RemoteException;
@@ -74,7 +76,7 @@ public class LoginStructures {
 			.writeShort(0x64)
 			.writeByte(0x00)
 
-			.write((builder) -> {
+			.write(builder -> {
 				builder.writeByte(channels.size());
 				channels.stream()
 					.map(channel -> {
@@ -103,10 +105,75 @@ public class LoginStructures {
 	}
 
 	// TODO
+	public static void appendCharacterEntry(IPacketWriter writer, Character character, boolean rank) {
+		appendCharacterStats(writer, character);
+		appendCharacterLooks(writer, character);
+
+		writer.writeBool(rank);
+		if (rank) {
+			writer
+				.writeInt(0)
+				.writeInt(0)
+				.writeInt(0)
+				.writeInt(0);
+		}
+	}
+
+	public static void appendCharacterStats(IPacketWriter writer, Character character) {
+		System.out.println(character.getId());
+		writer
+			.writeInt(character.getId())
+			.writeBytes(character.getName().substring(0, Math.min(13, character.getName().length())).getBytes()) // This is a lil' different..
+			.writeBytes(0x00, 13 - character.getName().length())
+			.writeByte(character.getGender())
+			.writeByte(character.getSkin())
+			.writeInt(character.getFace())
+			.writeInt(character.getHair())
+
+			.writeLong(0).writeLong(0).writeLong(0) // Pets
+
+			.writeByte(1)
+			.writeShort(0)
+			.writeShort(4)
+			.writeShort(4)
+			.writeShort(4)
+			.writeShort(4)
+			.writeShort(15)
+			.writeShort(15)
+			.writeShort(15)
+			.writeShort(15)
+			.writeShort(0)
+			.writeShort(0)
+			.writeInt(0)
+			.writeShort(0)
+			.writeInt(0)
+			.writeInt(0)
+			.writeByte(0)
+			.writeInt(0);
+	}
+
+	public static void appendCharacterLooks(IPacketWriter writer, Character character) {
+		writer
+			.writeByte(character.getGender())
+			.writeByte(character.getSkin())
+			.writeInt(character.getFace())
+			.writeBool(true)
+			.writeInt(character.getHair())
+
+			.writeByte(0xFF)
+			.writeByte(0xFF)
+			.writeInt(0)
+
+			.writeInt(0).writeInt(0).writeInt(0);
+	}
+
 	public static IPacket getSelectWorldSuccess(Account account) {
+		System.out.println(account.getCharacters());
 		return PacketBuilder.create(LoginSendOperations.SELECT_WORLD_RESULT)
 			.writeBool(false)
-			.writeByte(0)
+			.writeByte(account.getCharacters().size())
+			.write(builder -> account.getCharacters()
+				.forEach(character -> appendCharacterEntry(builder, character, true)))
 			.writeInt(3)
 			.build();
 	}
@@ -121,6 +188,20 @@ public class LoginStructures {
 	public static IPacket getCreateNewCharacterFailed() {
 		return PacketBuilder.create(LoginSendOperations.CREATE_NEW_CHARACTER_RESULT)
 			.writeBool(true)
+			.build();
+	}
+
+	public static IPacket getCreateNewCharacterSuccess(Character character) {
+		return PacketBuilder.create(LoginSendOperations.CREATE_NEW_CHARACTER_RESULT)
+			.writeBool(false)
+			.write(builder -> appendCharacterEntry(builder, character, false))
+			.build();
+	}
+
+	public static IPacket getDeleteCharacterResult(int characterId, IValue<Byte> result) {
+		return PacketBuilder.create(LoginSendOperations.DELETE_CHARACTER_RESULT)
+			.writeInt(characterId)
+			.writeByte(result.getValue())
 			.build();
 	}
 

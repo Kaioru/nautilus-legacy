@@ -4,6 +4,8 @@ import co.kaioru.nautilus.orm.Model;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +20,8 @@ public class Account extends Model {
 	@Column(unique = true, nullable = false)
 	private int identity;
 
-	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@Fetch(FetchMode.SELECT)
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, orphanRemoval = true)
 	private List<Character> characters = Lists.newArrayList();
 
 }

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.io.BufferedReader;
@@ -44,7 +45,9 @@ public class LoginServerImpl extends LoginServer {
 			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
 			LoginServerImpl server = new LoginServerImpl(config, entityManagerFactory);
 
-			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(new BasicAuthenticator(entityManagerFactory.createEntityManager())));
+			EntityManager entityManager = entityManagerFactory.createEntityManager();
+
+			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(new BasicAuthenticator(entityManager)));
 			server.registerPacketHandler(GUEST_ID_LOGIN, new GuestIDLoginHandler());
 			server.registerPacketHandler(WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
 			server.registerPacketHandler(CHECK_USER_LIMIT, new CheckUserLimitHandler());
@@ -54,7 +57,8 @@ public class LoginServerImpl extends LoginServer {
 			server.registerPacketHandler(WORLD_REQUEST, new WorldInfoRequestHandler());
 			server.registerPacketHandler(LOGOUT_WORLD, new LogoutWorldHandler());
 			server.registerPacketHandler(CHECK_DUPLICATED_ID, new CheckDuplicatedIDHandler());
-			server.registerPacketHandler(CREATE_NEW_CHARACTER, new CreateNewCharacterHandler(entityManagerFactory.createEntityManager()));
+			server.registerPacketHandler(CREATE_NEW_CHARACTER, new CreateNewCharacterHandler(entityManager));
+			server.registerPacketHandler(DELETE_CHARACTER, new DeleteCharacterHandler(entityManager));
 
 			setInstance(server);
 			server.run();

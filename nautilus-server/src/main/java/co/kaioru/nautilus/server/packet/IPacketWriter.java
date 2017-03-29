@@ -11,6 +11,8 @@ public interface IPacketWriter {
 
 	IPacketWriter writeBytes(byte[] data);
 
+	IPacketWriter writeBytes(int data, int i);
+
 	IPacketWriter writeBool(boolean data);
 
 	IPacketWriter writeShort(int data);

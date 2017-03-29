@@ -7,8 +7,6 @@ import io.netty.buffer.Unpooled;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class PacketBuilder implements IPacketWriter {
 
@@ -39,6 +37,13 @@ public class PacketBuilder implements IPacketWriter {
 	@Override
 	public IPacketWriter writeBytes(byte[] data) {
 		buffer.writeBytes(data);
+		return this;
+	}
+
+	@Override
+	public IPacketWriter writeBytes(int data, int i) {
+		for (int ii = 0; ii < i; ii++)
+			buffer.writeByte(data);
 		return this;
 	}
 
