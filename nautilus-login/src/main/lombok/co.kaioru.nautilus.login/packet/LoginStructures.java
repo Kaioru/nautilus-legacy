@@ -120,7 +120,6 @@ public class LoginStructures {
 	}
 
 	public static void appendCharacterStats(IPacketWriter writer, Character character) {
-		System.out.println(character.getId());
 		writer
 			.writeInt(character.getId())
 			.writeBytes(character.getName().substring(0, Math.min(13, character.getName().length())).getBytes()) // This is a lil' different..
