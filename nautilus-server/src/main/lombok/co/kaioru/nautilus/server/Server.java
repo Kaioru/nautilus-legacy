@@ -11,9 +11,12 @@ import co.kaioru.nautilus.server.packet.*;
 import com.google.common.collect.Maps;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import java.util.Map;
 public abstract class Server<C extends ICluster, CO extends ServerConfig> extends Shard<C, CO> implements IServer<C, CO> {
 
 	private Channel channel;
+	private ChannelGroup channelGroup;
 	private EventLoopGroup bossGroup, workerGroup;
 
 	private IRemoteUserFactory remoteUserFactory;
@@ -47,6 +51,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 		short minorVersion = getConfig().getMapleMinorVersion();
 		ICrypto crypto = new ShandaCrypto();
 
+		this.channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 		this.bossGroup = new NioEventLoopGroup(2);
 		this.workerGroup = new NioEventLoopGroup(4);
 
@@ -85,6 +90,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									.writeByte((byte) 8)
 									.buildAndFlush(channel);
 
+								channelGroup.add(channel);
 								channel.attr(RemoteUser.USER_KEY).set(user);
 								channel.attr(RemoteUser.RECV_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, riv));
 								channel.attr(RemoteUser.SEND_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, siv));
@@ -112,7 +118,12 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 							@Override
 							public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 								super.channelInactive(ctx);
-								ctx.channel().attr(RemoteUser.USER_KEY).get().close();
+
+								Channel channel = ctx.channel();
+								RemoteUser user = channel.attr(RemoteUser.USER_KEY).get();
+
+								user.close();
+								channelGroup.remove(channel);
 							}
 
 						},
@@ -131,6 +142,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 			.addListener((ChannelFutureListener) channelFuture -> {
 				workerGroup.shutdownGracefully();
 				bossGroup.shutdownGracefully();
+				channelGroup.disconnect();
 			});
 	}
 
