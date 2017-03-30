@@ -60,6 +60,8 @@ public class LoginServerImpl extends LoginServer {
 			server.registerPacketHandler(SELECT_WORLD, new SelectWorldHandler());
 			server.registerPacketHandler(WORLD_REQUEST, new WorldInfoRequestHandler());
 			server.registerPacketHandler(LOGOUT_WORLD, new LogoutWorldHandler());
+			server.registerPacketHandler(VIEW_ALL_CHAR, new ViewAllCharHandler());
+			server.registerPacketHandler(VAC_FLAG_SET, new VACFlagSetHandler());
 			server.registerPacketHandler(CHECK_DUPLICATED_ID, new CheckDuplicatedIDHandler(entityManager));
 			server.registerPacketHandler(CREATE_NEW_CHARACTER, new CreateNewCharacterHandler(entityManager));
 			server.registerPacketHandler(DELETE_CHARACTER, new DeleteCharacterHandler(entityManager));

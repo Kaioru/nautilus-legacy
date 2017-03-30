@@ -166,6 +166,24 @@ public class LoginStructures {
 			.writeInt(0).writeInt(0).writeInt(0);
 	}
 
+	public static IPacket getViewAllCharResultStart(int count) {
+		return PacketBuilder.create(LoginSendOperations.VIEW_ALL_CHAR_RESULT)
+			.writeBool(true)
+			.writeInt(count)
+			.writeInt(count + (3 - count % 3))
+			.build();
+	}
+
+	public static IPacket getViewAllCharResult(int world, List<Character> characters) {
+		return PacketBuilder.create(LoginSendOperations.VIEW_ALL_CHAR_RESULT)
+			.writeBool(false)
+			.writeByte(world)
+			.writeByte(characters.size())
+			.write(builder -> characters
+				.forEach(character -> appendCharacterEntry(builder, character, true)))
+			.build();
+	}
+
 	public static IPacket getSelectWorldSuccess(List<Character> characters) {
 		return PacketBuilder.create(LoginSendOperations.SELECT_WORLD_RESULT)
 			.writeBool(false)
