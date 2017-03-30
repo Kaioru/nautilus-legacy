@@ -4,6 +4,8 @@ import co.kaioru.nautilus.login.handler.*;
 import co.kaioru.nautilus.orm.auth.BasicAuthenticator;
 import co.kaioru.nautilus.server.game.LoginServer;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
+import co.kaioru.nautilus.server.game.user.IRemoteUserFactory;
+import co.kaioru.nautilus.server.game.user.RemoteUserFactory;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +28,8 @@ public class LoginServerImpl extends LoginServer {
 	@Setter
 	private static LoginServerImpl instance;
 
-	public LoginServerImpl(LoginConfig config, EntityManagerFactory entityManagerFactory) {
-		super(config, entityManagerFactory);
+	public LoginServerImpl(LoginConfig config, IRemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
+		super(config, remoteUserFactory, entityManagerFactory);
 	}
 
 	public static void main(String[] args) {
@@ -42,12 +44,14 @@ public class LoginServerImpl extends LoginServer {
 			EntityManagerFactory entityManagerFactory = Persistence
 				.createEntityManagerFactory("co.kaioru.nautilus.orm.jpa", properties);
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
-			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
-			LoginServerImpl server = new LoginServerImpl(config, entityManagerFactory);
-
 			EntityManager entityManager = entityManagerFactory.createEntityManager();
+			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
+			LoginServerImpl server = new LoginServerImpl(
+				config,
+				new RemoteUserFactory(entityManager),
+				entityManagerFactory);
 
-			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(new BasicAuthenticator(entityManager)));
+			server.registerPacketHandler(CHECK_PASSWORD, new CheckPasswordHandler(entityManager, new BasicAuthenticator(entityManager)));
 			server.registerPacketHandler(GUEST_ID_LOGIN, new GuestIDLoginHandler());
 			server.registerPacketHandler(WORLD_INFO_REQUEST, new WorldInfoRequestHandler());
 			server.registerPacketHandler(CHECK_USER_LIMIT, new CheckUserLimitHandler());

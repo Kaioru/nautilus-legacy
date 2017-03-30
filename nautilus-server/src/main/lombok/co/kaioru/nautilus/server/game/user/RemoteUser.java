@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Getter
 @Setter
-public class RemoteUser extends User implements Closeable {
+public abstract class RemoteUser extends User {
 
 	public static final AttributeKey<RemoteUser> USER_KEY = AttributeKey.valueOf("USER");
 	public static final AttributeKey<MapleCrypto> RECV_CRYPTO_KEY = AttributeKey.valueOf("RECV");
@@ -33,10 +33,7 @@ public class RemoteUser extends User implements Closeable {
 		this.channel = channel;
 	}
 
-	@Override
-	public void close() {
-		channel.close();
-	}
+	public abstract void close();
 
 	public void sendPacket(IPacket packet) {
 		getChannel().writeAndFlush(packet);

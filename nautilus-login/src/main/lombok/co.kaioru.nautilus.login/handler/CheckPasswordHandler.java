@@ -3,18 +3,26 @@ package co.kaioru.nautilus.login.handler;
 import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Account;
+import co.kaioru.nautilus.orm.account.AccountState;
+import co.kaioru.nautilus.orm.account.Account_;
 import co.kaioru.nautilus.orm.auth.IAuthenticator;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.packet.IPacketHandler;
 import co.kaioru.nautilus.server.packet.IPacketReader;
 
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 public class CheckPasswordHandler implements IPacketHandler {
 
+	private final EntityManager entityManager;
 	private final IAuthenticator authenticator;
 
-	public CheckPasswordHandler(IAuthenticator authenticator) {
+	public CheckPasswordHandler(EntityManager entityManager, IAuthenticator authenticator) {
+		this.entityManager = entityManager;
 		this.authenticator = authenticator;
 	}
 
@@ -23,13 +31,35 @@ public class CheckPasswordHandler implements IPacketHandler {
 		String username = reader.readString();
 		String password = reader.readString();
 
-		Optional<Account> accountOptional = authenticator.authenticate(username, password);
+		int identityId = authenticator.authenticate(username, password);
 
-		if (accountOptional.isPresent()) {
-			Account account = accountOptional.get();
+		if (identityId > 0) {
+			Account account;
+			try {
+				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+				CriteriaQuery<Account> accountCriteriaQuery = builder.createQuery(Account.class);
+				Root<Account> accountRoot = accountCriteriaQuery.from(Account.class);
 
-			user.setAccount(account);
-			user.sendPacket(LoginStructures.getCheckPasswordSuccess(account));
+				accountCriteriaQuery.select(accountRoot);
+				accountCriteriaQuery.where(builder.equal(accountRoot.get(Account_.identity), identityId));
+
+				account = entityManager.createQuery(accountCriteriaQuery).getSingleResult();
+			} catch (NoResultException e) {
+				account = new Account();
+
+				account.setIdentity(identityId);
+			}
+
+			if (account.getState() == AccountState.LOGGED_OFF) {
+				account.setState(AccountState.LOGGED_IN);
+
+				entityManager.getTransaction().begin();
+				account = entityManager.merge(account);
+				entityManager.getTransaction().commit();
+
+				user.setAccount(account);
+				user.sendPacket(LoginStructures.getCheckPasswordSuccess(account));
+			} else user.sendPacket(LoginStructures.getCheckPasswordResult(CheckPasswordResult.ALREADY_LOGGED_IN));
 			return;
 		}
 

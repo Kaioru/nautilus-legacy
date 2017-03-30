@@ -5,6 +5,7 @@ import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
+import co.kaioru.nautilus.server.game.user.IRemoteUserFactory;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.packet.*;
 import com.google.common.collect.Maps;
@@ -29,10 +30,12 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 	private Channel channel;
 	private EventLoopGroup bossGroup, workerGroup;
 
+	private IRemoteUserFactory remoteUserFactory;
 	private Map<Integer, IPacketHandler> handlers;
 
-	public Server(CO config, EntityManagerFactory entityManagerFactory) {
+	public Server(CO config, IRemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
 		super(config, entityManagerFactory);
+		this.remoteUserFactory = remoteUserFactory;
 		this.handlers = Maps.newConcurrentMap();
 	}
 
@@ -72,7 +75,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									0x33, 0x00, 0x00, 0x00,
 									0x52, 0x00, 0x00, 0x00};
 								Channel channel = ctx.channel();
-								RemoteUser remoteUser = new RemoteUser(channel);
+								RemoteUser user = remoteUserFactory.create(channel);
 
 								PacketBuilder.create(0x0E)
 									.writeShort(majorVersion)
@@ -82,7 +85,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									.writeByte((byte) 8)
 									.buildAndFlush(channel);
 
-								channel.attr(RemoteUser.USER_KEY).set(remoteUser);
+								channel.attr(RemoteUser.USER_KEY).set(user);
 								channel.attr(RemoteUser.RECV_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, riv));
 								channel.attr(RemoteUser.SEND_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, siv));
 							}
@@ -90,20 +93,26 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 							@Override
 							public void channelRead(ChannelHandlerContext ctx, Object msg) {
 								IPacketReader reader = new PacketReader((Packet) msg);
-								RemoteUser remoteUser = ctx.channel().attr(RemoteUser.USER_KEY).get();
+								RemoteUser user = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
 								int operation = reader.readShort();
 								IPacketHandler handler = handlers.get(operation);
 
 								if (handler != null) {
-									if (handler.validate(remoteUser))
-										handler.handle(remoteUser, reader);
+									if (handler.validate(user))
+										handler.handle(user, reader);
 									log.debug("Handled operation code {} with {}",
 										operation,
 										handler.getClass().getSimpleName());
 								} else {
 									log.warn("No packet handlers found for operation code {}", operation);
 								}
+							}
+
+							@Override
+							public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+								super.channelInactive(ctx);
+								ctx.channel().attr(RemoteUser.USER_KEY).get().close();
 							}
 
 						},

@@ -20,6 +20,10 @@ public class Account extends Model {
 	@Column(unique = true, nullable = false)
 	private int identity;
 
+	@Enumerated(EnumType.STRING)
+	@Column
+	private AccountState state = AccountState.LOGGED_OFF;
+
 	@Fetch(FetchMode.SELECT)
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, orphanRemoval = true)
 	private List<Character> characters = Lists.newArrayList();
