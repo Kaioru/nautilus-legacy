@@ -166,12 +166,11 @@ public class LoginStructures {
 			.writeInt(0).writeInt(0).writeInt(0);
 	}
 
-	public static IPacket getSelectWorldSuccess(Account account) {
-		System.out.println(account.getCharacters());
+	public static IPacket getSelectWorldSuccess(List<Character> characters) {
 		return PacketBuilder.create(LoginSendOperations.SELECT_WORLD_RESULT)
 			.writeBool(false)
-			.writeByte(account.getCharacters().size())
-			.write(builder -> account.getCharacters()
+			.writeByte(characters.size())
+			.write(builder -> characters
 				.forEach(character -> appendCharacterEntry(builder, character, true)))
 			.writeInt(3)
 			.build();

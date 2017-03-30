@@ -2,6 +2,7 @@ package co.kaioru.nautilus.login.handler;
 
 import co.kaioru.nautilus.login.LoginServerImpl;
 import co.kaioru.nautilus.login.packet.LoginStructures;
+import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.IDaemon;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
@@ -10,8 +11,10 @@ import co.kaioru.nautilus.server.packet.IPacketHandler;
 import co.kaioru.nautilus.server.packet.IPacketReader;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 public class SelectWorldHandler implements IPacketHandler {
 
@@ -30,18 +33,22 @@ public class SelectWorldHandler implements IPacketHandler {
 			};
 			IWorldCluster cluster = LoginServerImpl.getInstance().getClusters()
 				.stream()
-				.filter((c) -> filterById.test(c, worldId))
+				.filter(d -> filterById.test(d, worldId))
 				.findFirst()
 				.orElseThrow(() -> new NoSuchElementException());
 			IChannelServer channel = cluster.getChannelServers()
 				.stream()
-				.filter((c) -> filterById.test(c, channelId))
+				.filter(d -> filterById.test(d, channelId))
 				.findFirst()
 				.orElseThrow(() -> new NoSuchElementException());
+			List<Character> characters = user.getAccount().getCharacters()
+				.stream()
+				.filter(c -> c.getWorld() == worldId)
+				.collect(Collectors.toList());
 
 			user.setWorldCluster(cluster);
 			user.setChannelServer(channel);
-			user.sendPacket(LoginStructures.getSelectWorldSuccess(user.getAccount()));
+			user.sendPacket(LoginStructures.getSelectWorldSuccess(characters));
 		} catch (RemoteException | NoSuchElementException e) {
 			user.close();
 		}
