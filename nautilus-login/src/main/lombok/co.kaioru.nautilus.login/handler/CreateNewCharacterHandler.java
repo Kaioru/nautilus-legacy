@@ -3,8 +3,6 @@ package co.kaioru.nautilus.login.handler;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Account;
 import co.kaioru.nautilus.orm.account.Character;
-import co.kaioru.nautilus.orm.account.item.EquipInventory;
-import co.kaioru.nautilus.orm.account.item.EquipItem;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.packet.IPacketHandler;
 import co.kaioru.nautilus.server.packet.IPacketReader;
@@ -41,32 +39,37 @@ public class CreateNewCharacterHandler implements IPacketHandler {
 			byte luk = reader.readByte();
 			int total = str + dex + _int + luk;
 
-			Account account = user.getAccount();
-			Character character = new Character(account);
-			character.setWorld(user.getWorldCluster().getConfig().getId());
-			character.setName(name);
-			character.setFace(face);
-			character.setHair(hair + hairColor);
-			character.setSkin((byte) skin);
-			character.setGender(gender);
+			if (CheckDuplicatedIDHandler.getPredicate().test(entityManager, name)) {
+				Account account = user.getAccount();
+				Character character = new Character(account);
+				character.setWorld(user.getWorldCluster().getConfig().getId());
+				character.setName(name);
+				character.setFace(face);
+				character.setHair(hair + hairColor);
+				character.setSkin((byte) skin);
+				character.setGender(gender);
 
-			account.getCharacters().add(character);
+				account.getCharacters().add(character);
 
-			//EquipInventory equipped = character.getEquippedInventory();
-			// TODO
-			entityManager.getTransaction().begin();
-			entityManager.persist(character);
-			entityManager.merge(account);
-			entityManager.getTransaction().commit();
+				// EquipInventory equipped = character.getEquippedInventory();
+				// TODO
 
-			// Hacky but w/e it works
-			character = account.getCharacters().get(account.getCharacters().size() - 1);
+				entityManager.getTransaction().begin();
+				entityManager.persist(character);
+				entityManager.merge(account);
+				entityManager.getTransaction().commit();
 
-			user.sendPacket(LoginStructures.getCreateNewCharacterSuccess(character));
+				// Hacky but w/e it works
+				character = account.getCharacters().get(account.getCharacters().size() - 1);
+
+				user.sendPacket(LoginStructures.getCreateNewCharacterSuccess(character));
+				return;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			user.sendPacket(LoginStructures.getCreateNewCharacterFailed());
 		}
+
+		user.sendPacket(LoginStructures.getCreateNewCharacterFailed());
 	}
 
 }
