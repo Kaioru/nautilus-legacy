@@ -9,6 +9,6 @@ public class ServerConfig extends ShardConfig {
 
 	private short mapleMajorVersion;
 	private short mapleMinorVersion;
-	private int port;
+	private short port;
 
 }
