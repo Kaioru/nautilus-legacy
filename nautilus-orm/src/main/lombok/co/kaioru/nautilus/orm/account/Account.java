@@ -22,7 +22,7 @@ public class Account extends Model {
 
 	@Enumerated(EnumType.STRING)
 	@Column
-	private AccountState state = AccountState.LOGGED_OFF;
+	private AccountState state = AccountState.LOGGED_OUT;
 
 	@Fetch(FetchMode.SELECT)
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, orphanRemoval = true)

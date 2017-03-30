@@ -50,7 +50,7 @@ public class CheckPasswordHandler implements IPacketHandler {
 				account.setIdentity(identityId);
 			}
 
-			if (account.getState() == AccountState.LOGGED_OFF) {
+			if (account.getState() == AccountState.LOGGED_OUT) {
 				account.setState(AccountState.LOGGED_IN);
 
 				entityManager.getTransaction().begin();

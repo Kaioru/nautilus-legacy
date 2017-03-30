@@ -23,7 +23,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 				Account account = getAccount();
 
 				if (account != null) {
-					account.setState(AccountState.LOGGED_OFF);
+					account.setState(AccountState.LOGGED_OUT);
 					entityManager.getTransaction().begin();
 					entityManager.merge(account);
 					entityManager.getTransaction().commit();
