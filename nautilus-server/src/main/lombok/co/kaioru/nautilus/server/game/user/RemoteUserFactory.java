@@ -52,6 +52,8 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 
 				if (migration != null) {
 					if (!migration.isExpired()) {
+						entityManager.clear();
+
 						Character character = entityManager.find(Character.class, characterId);
 						Account account = character.getAccount();
 
