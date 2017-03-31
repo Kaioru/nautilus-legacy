@@ -35,6 +35,9 @@ public class CheckPasswordHandler implements IPacketHandler {
 
 		if (identityId > 0) {
 			Account account;
+
+			entityManager.clear();
+
 			try {
 				CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 				CriteriaQuery<Account> accountCriteriaQuery = builder.createQuery(Account.class);
