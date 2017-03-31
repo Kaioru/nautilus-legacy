@@ -35,12 +35,12 @@ public class SelectWorldHandler implements IPacketHandler {
 				.stream()
 				.filter(d -> filterById.test(d, worldId))
 				.findFirst()
-				.orElseThrow(() -> new NoSuchElementException());
+				.orElseThrow(NoSuchElementException::new);
 			IChannelServer channel = cluster.getChannelServers()
 				.stream()
 				.filter(d -> filterById.test(d, channelId))
 				.findFirst()
-				.orElseThrow(() -> new NoSuchElementException());
+				.orElseThrow(NoSuchElementException::new);
 			List<Character> characters = user.getAccount().getCharacters()
 				.stream()
 				.filter(c -> c.getWorld() == worldId)

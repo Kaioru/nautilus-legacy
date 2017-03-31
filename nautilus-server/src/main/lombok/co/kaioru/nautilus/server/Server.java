@@ -7,8 +7,10 @@ import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
 import co.kaioru.nautilus.server.game.user.IRemoteUserFactory;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
+import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.packet.*;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.persistence.EntityManagerFactory;
 import java.security.GeneralSecurityException;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,11 +39,13 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 	private IRemoteUserFactory remoteUserFactory;
 	private Map<Integer, IPacketHandler> handlers;
+	private Set<IServerMigration> migrations;
 
 	public Server(CO config, IRemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
 		super(config, entityManagerFactory);
 		this.remoteUserFactory = remoteUserFactory;
 		this.handlers = Maps.newConcurrentMap();
+		this.migrations = Sets.newConcurrentHashSet();
 	}
 
 	@Override
@@ -152,6 +157,24 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 	public void deregisterPacketHandler(IPacketHandler handler) {
 		handlers.remove(handler);
+	}
+
+	@Override
+	public void registerServerMigration(IServerMigration serverMigration) {
+		migrations.add(serverMigration);
+	}
+
+	@Override
+	public void deregisterServerMigration(IServerMigration serverMigration) {
+		migrations.remove(serverMigration);
+	}
+
+	@Override
+	public IServerMigration getServerMigration(int characterId) {
+		return migrations.stream()
+			.filter(m -> m.getCharacterId() == characterId)
+			.findFirst()
+			.orElse(null);
 	}
 
 }

@@ -2,6 +2,8 @@ package co.kaioru.nautilus.server.game.user;
 
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
+import co.kaioru.nautilus.server.IServer;
+import co.kaioru.nautilus.server.config.ServerConfig;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
 import co.kaioru.nautilus.server.packet.IPacket;
@@ -32,6 +34,8 @@ public abstract class RemoteUser extends User {
 	public RemoteUser(Channel channel) {
 		this.channel = channel;
 	}
+
+	public abstract void migrate(IServer<?, ? extends ServerConfig> server) throws Exception;
 
 	public abstract void close();
 
