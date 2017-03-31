@@ -1,6 +1,6 @@
 package co.kaioru.nautilus.login.handler;
 
-import co.kaioru.nautilus.login.LoginServerImpl;
+import co.kaioru.nautilus.login.LoginServerApplication;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.IDaemon;
@@ -31,7 +31,7 @@ public class SelectWorldHandler implements IPacketHandler {
 					return false;
 				}
 			};
-			IWorldCluster cluster = LoginServerImpl.getInstance().getClusters()
+			IWorldCluster cluster = LoginServerApplication.getInstance().getClusters()
 				.stream()
 				.filter(d -> filterById.test(d, worldId))
 				.findFirst()

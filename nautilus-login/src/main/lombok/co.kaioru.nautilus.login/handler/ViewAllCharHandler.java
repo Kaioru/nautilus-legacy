@@ -1,6 +1,6 @@
 package co.kaioru.nautilus.login.handler;
 
-import co.kaioru.nautilus.login.LoginServerImpl;
+import co.kaioru.nautilus.login.LoginServerApplication;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
@@ -19,7 +19,7 @@ public class ViewAllCharHandler implements IPacketHandler {
 	public void handle(RemoteUser user, IPacketReader reader) {
 		Map<Integer, List<Character>> characters = Maps.newHashMap();
 
-		LoginServerImpl.getInstance().getClusters()
+		LoginServerApplication.getInstance().getClusters()
 			.forEach(w -> {
 				try {
 					int worldId = w.getConfig().getId();

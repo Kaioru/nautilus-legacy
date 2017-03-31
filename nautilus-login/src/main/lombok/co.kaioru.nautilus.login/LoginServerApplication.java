@@ -22,15 +22,11 @@ import java.util.Properties;
 import static co.kaioru.nautilus.login.packet.LoginRecvOperations.*;
 
 @Slf4j
-public class LoginServerImpl extends LoginServer {
+public class LoginServerApplication {
 
 	@Getter
 	@Setter
-	private static LoginServerImpl instance;
-
-	public LoginServerImpl(LoginConfig config, IRemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
-		super(config, remoteUserFactory, entityManagerFactory);
-	}
+	private static LoginServer instance;
 
 	public static void main(String[] args) {
 		String configPath = "config.json";
@@ -46,7 +42,7 @@ public class LoginServerImpl extends LoginServer {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			EntityManager entityManager = entityManagerFactory.createEntityManager();
 			LoginConfig config = new Gson().fromJson(br, LoginConfig.class);
-			LoginServerImpl server = new LoginServerImpl(
+			LoginServer server = new LoginServer(
 				config,
 				new RemoteUserFactory(entityManager),
 				entityManagerFactory);
