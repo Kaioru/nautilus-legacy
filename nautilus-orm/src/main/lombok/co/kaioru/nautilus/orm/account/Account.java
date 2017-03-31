@@ -8,6 +8,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,10 @@ public class Account extends Model {
 	@Enumerated(EnumType.STRING)
 	@Column
 	private AccountState state = AccountState.LOGGED_OUT;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column
+	private Date lastMigrationTime;
 
 	@Fetch(FetchMode.SELECT)
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, orphanRemoval = true)

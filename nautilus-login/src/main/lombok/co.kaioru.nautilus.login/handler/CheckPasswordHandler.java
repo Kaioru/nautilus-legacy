@@ -15,6 +15,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 public class CheckPasswordHandler implements IPacketHandler {
 
@@ -53,8 +56,16 @@ public class CheckPasswordHandler implements IPacketHandler {
 				account.setIdentity(identityId);
 			}
 
+			if (account.getState() == AccountState.MIGRATING) {
+				Instant last = Instant.ofEpochMilli(account.getLastMigrationTime().getTime());
+
+				if (ChronoUnit.SECONDS.between(last, Instant.now()) > 30)
+					account.setState(AccountState.LOGGED_OUT);
+			}
+
 			if (account.getState() == AccountState.LOGGED_OUT) {
 				account.setState(AccountState.LOGGED_IN);
+				account.setLastMigrationTime(Date.from(Instant.now()));
 
 				entityManager.getTransaction().begin();
 				account = entityManager.merge(account);

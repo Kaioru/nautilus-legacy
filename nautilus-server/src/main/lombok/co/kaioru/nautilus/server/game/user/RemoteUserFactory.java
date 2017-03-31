@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
+import java.sql.Date;
+import java.time.Instant;
 
 public class RemoteUserFactory implements IRemoteUserFactory {
 
@@ -34,6 +36,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 				Character character = getCharacter();
 
 				account.setState(AccountState.MIGRATING);
+				account.setLastMigrationTime(Date.from(Instant.now()));
 				entityManager.getTransaction().begin();
 				entityManager.merge(account);
 				entityManager.getTransaction().commit();

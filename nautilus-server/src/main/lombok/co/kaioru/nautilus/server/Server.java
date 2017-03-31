@@ -160,13 +160,16 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 	}
 
 	@Override
-	public void registerServerMigration(IServerMigration serverMigration) {
-		migrations.add(serverMigration);
+	public void registerServerMigration(IServerMigration migration) {
+		IServerMigration existing = getServerMigration(migration.getCharacterId());
+
+		if (existing != null) deregisterServerMigration(existing);
+		migrations.add(migration);
 	}
 
 	@Override
-	public void deregisterServerMigration(IServerMigration serverMigration) {
-		migrations.remove(serverMigration);
+	public void deregisterServerMigration(IServerMigration migration) {
+		migrations.remove(migration);
 	}
 
 	@Override
