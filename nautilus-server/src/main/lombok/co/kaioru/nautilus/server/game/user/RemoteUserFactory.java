@@ -42,7 +42,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 				entityManager.merge(account);
 				entityManager.getTransaction().commit();
 
-				server.registerServerMigration(new ServerMigration(character.getId()));
+				server.registerServerMigration(new ServerMigration(character.getId(), getWorldCluster(), getChannelServer()));
 				sendPacket(SocketStructures.getMigrateCommand(serverAddress, serverPort));
 			}
 
