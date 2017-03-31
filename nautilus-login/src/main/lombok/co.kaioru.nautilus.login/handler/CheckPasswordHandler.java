@@ -7,6 +7,7 @@ import co.kaioru.nautilus.orm.account.AccountState;
 import co.kaioru.nautilus.orm.account.Account_;
 import co.kaioru.nautilus.orm.auth.IAuthenticator;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
+import co.kaioru.nautilus.server.migration.ServerMigration;
 import co.kaioru.nautilus.server.packet.IPacketHandler;
 import co.kaioru.nautilus.server.packet.IPacketReader;
 
@@ -59,7 +60,7 @@ public class CheckPasswordHandler implements IPacketHandler {
 			if (account.getState() == AccountState.MIGRATING) {
 				Instant last = Instant.ofEpochMilli(account.getLastMigrationTime().getTime());
 
-				if (ChronoUnit.SECONDS.between(last, Instant.now()) > 30)
+				if (ChronoUnit.SECONDS.between(last, Instant.now()) > ServerMigration.SECONDS_TO_EXPIRE)
 					account.setState(AccountState.LOGGED_OUT);
 			}
 

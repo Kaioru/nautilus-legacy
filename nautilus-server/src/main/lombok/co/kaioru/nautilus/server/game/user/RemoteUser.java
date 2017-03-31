@@ -6,6 +6,7 @@ import co.kaioru.nautilus.server.IServer;
 import co.kaioru.nautilus.server.config.ServerConfig;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
+import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.packet.IPacket;
 import co.kaioru.nautilus.server.packet.IPacketWriter;
 import io.netty.channel.Channel;
@@ -35,7 +36,9 @@ public abstract class RemoteUser extends User {
 		this.channel = channel;
 	}
 
-	public abstract void migrate(IServer<?, ? extends ServerConfig> server) throws Exception;
+	public abstract void migrateOut(IServer<?, ? extends ServerConfig> server) throws Exception;
+
+	public abstract void migrateIn(IServer server, int characterId) throws Exception;
 
 	public abstract void close();
 

@@ -5,6 +5,7 @@ import co.kaioru.nautilus.orm.account.AccountState;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.IServer;
 import co.kaioru.nautilus.server.config.ServerConfig;
+import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.migration.ServerMigration;
 import co.kaioru.nautilus.server.packet.game.SocketStructures;
 import io.netty.channel.Channel;
@@ -29,7 +30,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 		return new RemoteUser(channel) {
 
 			@Override
-			public void migrate(IServer<?, ? extends ServerConfig> server) throws RemoteException, UnknownHostException {
+			public void migrateOut(IServer<?, ? extends ServerConfig> server) throws RemoteException, UnknownHostException {
 				InetAddress serverAddress = InetAddress.getByName(server.getConfig().getHost());
 				short serverPort = server.getConfig().getPort();
 				Account account = getAccount();
@@ -41,8 +42,33 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 				entityManager.merge(account);
 				entityManager.getTransaction().commit();
 
-				server.registerServerMigration(new ServerMigration(account.getId(), character.getId()));
+				server.registerServerMigration(new ServerMigration(character.getId()));
 				sendPacket(SocketStructures.getMigrateCommand(serverAddress, serverPort));
+			}
+
+			@Override
+			public void migrateIn(IServer server, int characterId) throws Exception {
+				IServerMigration migration = server.getServerMigration(characterId);
+
+				if (migration != null) {
+					if (!migration.isExpired()) {
+						Character character = entityManager.find(Character.class, characterId);
+						Account account = character.getAccount();
+
+						setAccount(account);
+						setCharacter(character);
+						account.setState(AccountState.LOGGED_IN);
+
+						entityManager.getTransaction().begin();
+						entityManager.merge(account);
+						entityManager.getTransaction().commit();
+
+						server.deregisterServerMigration(migration);
+						return;
+					}
+				}
+
+				close();
 			}
 
 			@Override

@@ -8,18 +8,18 @@ import java.time.temporal.ChronoUnit;
 @Getter
 public class ServerMigration implements IServerMigration {
 
-	private final int accountId;
+	public static int SECONDS_TO_EXPIRE = 30;
+
 	private final int characterId;
 	private final Instant instant;
 
-	public ServerMigration(int accountId, int characterId) {
-		this.accountId = accountId;
+	public ServerMigration(int characterId) {
 		this.characterId = characterId;
 		this.instant = Instant.now();
 	}
 
 	public boolean isExpired() {
-		return ChronoUnit.SECONDS.between(instant, Instant.now()) > 30;
+		return ChronoUnit.SECONDS.between(instant, Instant.now()) > SECONDS_TO_EXPIRE;
 	}
 
 }

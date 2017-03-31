@@ -23,7 +23,7 @@ public class SelectCharacterHandler implements IPacketHandler {
 			IChannelServer server = user.getChannelServer();
 
 			user.setCharacter(character);
-			user.migrate(server);
+			user.migrateOut(server);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
