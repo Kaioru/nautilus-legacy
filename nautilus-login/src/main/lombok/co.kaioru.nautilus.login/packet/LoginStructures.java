@@ -10,6 +10,7 @@ import co.kaioru.nautilus.server.packet.IPacket;
 import co.kaioru.nautilus.server.packet.IPacketWriter;
 import co.kaioru.nautilus.server.packet.PacketBuilder;
 
+import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Objects;
@@ -156,7 +157,7 @@ public class LoginStructures {
 			.writeByte(character.getGender())
 			.writeByte(character.getSkin())
 			.writeInt(character.getFace())
-			.writeBool(true)
+			.writeBool(false)
 			.writeInt(character.getHair())
 
 			.writeByte(0xFF)
@@ -218,6 +219,16 @@ public class LoginStructures {
 		return PacketBuilder.create(LoginSendOperations.DELETE_CHARACTER_RESULT)
 			.writeInt(characterId)
 			.writeByte(result.getValue())
+			.build();
+	}
+
+	public static IPacket getSelectCharacterSuccess(InetAddress address, short port, int characterId) {
+		return PacketBuilder.create(LoginSendOperations.SELECT_CHARACTER_RESULT)
+			.writeShort(0)
+			.writeBytes(address.getAddress())
+			.writeShort(port)
+			.writeInt(characterId)
+			.writeBytes(0x00, 5)
 			.build();
 	}
 

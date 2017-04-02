@@ -36,7 +36,7 @@ public abstract class RemoteUser extends User {
 		this.channel = channel;
 	}
 
-	public abstract void migrateOut(IServer<?, ? extends ServerConfig> server) throws Exception;
+	public abstract void migrateOut(IServer server) throws Exception;
 
 	public abstract void migrateIn(IServer server, int characterId) throws Exception;
 

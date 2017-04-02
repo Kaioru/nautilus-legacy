@@ -29,9 +29,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 		return new RemoteUser(channel) {
 
 			@Override
-			public void migrateOut(IServer<?, ? extends ServerConfig> server) throws RemoteException, UnknownHostException {
-				InetAddress serverAddress = InetAddress.getByName(server.getConfig().getHost());
-				short serverPort = server.getConfig().getPort();
+			public void migrateOut(IServer server) throws RemoteException, UnknownHostException {
 				Account account = getAccount();
 				Character character = getCharacter();
 
@@ -42,7 +40,6 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 				entityManager.getTransaction().commit();
 
 				server.registerMigration(getWorldCluster(), getChannelServer(), character.getId());
-				sendPacket(SocketStructures.getMigrateCommand(serverAddress, serverPort));
 			}
 
 			@Override

@@ -21,6 +21,8 @@ public class MigrateInHandler implements IPacketHandler {
 					user.setWorldCluster(migration.getWorldCluster());
 					user.setChannelServer(channelServer);
 					user.migrateIn(channelServer, characterId);
+
+					
 					return;
 				}
 			} catch (Exception e) {
@@ -28,7 +30,7 @@ public class MigrateInHandler implements IPacketHandler {
 			}
 		}
 
-		//user.close();
+		user.close();
 	}
 
 }

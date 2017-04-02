@@ -1,11 +1,13 @@
 package co.kaioru.nautilus.login.handler;
 
+import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.packet.IPacketHandler;
 import co.kaioru.nautilus.server.packet.IPacketReader;
 
+import java.net.InetAddress;
 import java.util.NoSuchElementException;
 
 public class SelectCharacterHandler implements IPacketHandler {
@@ -21,9 +23,12 @@ public class SelectCharacterHandler implements IPacketHandler {
 				.findFirst()
 				.orElseThrow(NoSuchElementException::new);
 			IChannelServer server = user.getChannelServer();
+			InetAddress address = InetAddress.getByName(server.getConfig().getHost());
+			short port = server.getConfig().getPort();
 
 			user.setCharacter(character);
 			user.migrateOut(server);
+			user.sendPacket(LoginStructures.getSelectCharacterSuccess(address, port, characterId));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
