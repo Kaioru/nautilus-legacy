@@ -1,9 +1,11 @@
 package co.kaioru.nautilus.channel;
 
+import co.kaioru.nautilus.channel.handler.MigrateInHandler;
 import co.kaioru.nautilus.server.game.ChannelServer;
 import co.kaioru.nautilus.server.game.config.ChannelConfig;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
 import co.kaioru.nautilus.server.game.user.RemoteUserFactory;
+import co.kaioru.nautilus.server.packet.game.SocketRecvOperations;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,15 +20,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 @Slf4j
-public class ChannelServerImpl extends ChannelServer {
+public class ChannelServerApplication  {
 
 	@Getter
 	@Setter
-	private static ChannelServerImpl instance;
-
-	public ChannelServerImpl(ChannelConfig config, RemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
-		super(config, remoteUserFactory, entityManagerFactory);
-	}
+	private static ChannelServer instance;
 
 	public static void main(String[] args) {
 		String configPath = "config.json";
@@ -42,10 +40,12 @@ public class ChannelServerImpl extends ChannelServer {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			EntityManager entityManager = entityManagerFactory.createEntityManager();
 			ChannelConfig config = new Gson().fromJson(br, ChannelConfig.class);
-			ChannelServerImpl server = new ChannelServerImpl(
+			ChannelServer server = new ChannelServer(
 				config,
 				new RemoteUserFactory(entityManager),
 				entityManagerFactory);
+
+			server.registerPacketHandler(SocketRecvOperations.MIGRATE_IN, new MigrateInHandler());
 
 			setInstance(server);
 			server.run();

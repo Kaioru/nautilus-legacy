@@ -6,7 +6,6 @@ import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.IServer;
 import co.kaioru.nautilus.server.config.ServerConfig;
 import co.kaioru.nautilus.server.migration.IServerMigration;
-import co.kaioru.nautilus.server.migration.ServerMigration;
 import co.kaioru.nautilus.server.packet.game.SocketStructures;
 import io.netty.channel.Channel;
 
@@ -42,7 +41,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 				entityManager.merge(account);
 				entityManager.getTransaction().commit();
 
-				server.registerServerMigration(new ServerMigration(character.getId(), getWorldCluster(), getChannelServer()));
+				server.registerMigration(getWorldCluster(), getChannelServer(), character.getId());
 				sendPacket(SocketStructures.getMigrateCommand(serverAddress, serverPort));
 			}
 
@@ -65,7 +64,7 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 						entityManager.merge(account);
 						entityManager.getTransaction().commit();
 
-						server.deregisterServerMigration(migration);
+						server.deregisterMigration(characterId);
 						return;
 					}
 				}
@@ -84,6 +83,8 @@ public class RemoteUserFactory implements IRemoteUserFactory {
 					entityManager.merge(account);
 					entityManager.getTransaction().commit();
 				}
+
+				channel.close();
 			}
 
 		};

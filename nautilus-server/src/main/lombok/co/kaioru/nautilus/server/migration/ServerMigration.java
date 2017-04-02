@@ -12,15 +12,15 @@ public class ServerMigration implements IServerMigration {
 
 	public static int SECONDS_TO_EXPIRE = 30;
 
-	private final int characterId;
 	private final IWorldCluster worldCluster;
 	private final IChannelServer channelServer;
+	private final int characterId;
 	private final Instant instant;
 
-	public ServerMigration(int characterId, IWorldCluster worldCluster, IChannelServer channelServer) {
-		this.characterId = characterId;
+	public ServerMigration(IWorldCluster worldCluster, IChannelServer channelServer, int characterId) {
 		this.worldCluster = worldCluster;
 		this.channelServer = channelServer;
+		this.characterId = characterId;
 		this.instant = Instant.now();
 	}
 

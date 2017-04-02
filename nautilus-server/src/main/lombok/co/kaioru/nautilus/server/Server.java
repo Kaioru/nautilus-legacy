@@ -5,13 +5,17 @@ import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
+import co.kaioru.nautilus.server.game.IChannelServer;
+import co.kaioru.nautilus.server.game.IWorldCluster;
 import co.kaioru.nautilus.server.game.user.IRemoteUserFactory;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.migration.IServerMigration;
+import co.kaioru.nautilus.server.migration.ServerMigration;
 import co.kaioru.nautilus.server.packet.*;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -24,7 +28,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.EntityManagerFactory;
+import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -160,16 +166,14 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 	}
 
 	@Override
-	public void registerServerMigration(IServerMigration migration) {
-		IServerMigration existing = getServerMigration(migration.getCharacterId());
-
-		if (existing != null) deregisterServerMigration(existing);
-		migrations.add(migration);
+	public void registerMigration(IWorldCluster worldCluster, IChannelServer channelServer, int characterId) throws RemoteException {
+		deregisterMigration(characterId);
+		migrations.add(new ServerMigration(worldCluster, channelServer, characterId));
 	}
 
 	@Override
-	public void deregisterServerMigration(IServerMigration migration) {
-		migrations.remove(migration);
+	public void deregisterMigration(int characterId) throws RemoteException {
+		migrations.removeIf(s -> s.getCharacterId() == characterId);
 	}
 
 	@Override
