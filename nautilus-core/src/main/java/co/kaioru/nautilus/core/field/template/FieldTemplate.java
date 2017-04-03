@@ -1,4 +1,4 @@
-package co.kaioru.nautilus.data.template.field;
+package co.kaioru.nautilus.core.field.template;
 
 import co.kaioru.nautilus.data.IDataNode;
 import co.kaioru.nautilus.data.template.ITemplate;
@@ -22,9 +22,7 @@ public class FieldTemplate implements ITemplate {
 
 	public FieldTemplate(final int templateID,
 						 final IDataNode info,
-						 final IDataNode foothold,
-						 final IDataNode portal,
-						 final IDataNode life) {
+						 final IDataNode foothold) {
 		this.templateID = templateID;
 		this.returnMap = info.getInt("returnMap", 999999999);
 
@@ -88,8 +86,8 @@ public class FieldTemplate implements ITemplate {
 
 		int mobCapacity = (int) (width * height * mobRate * 1 / 1.28 / 100000);
 
-		if (mobCapacity < 1) mobCapacity = 1;
-		if (mobCapacity > 40) mobCapacity = 40;
+		mobCapacity = Math.max(1, mobCapacity);
+		mobCapacity = Math.min(40, mobCapacity);
 
 		this.mobCapacityMin = mobCapacity;
 		this.mobCapacityMax = mobCapacity * 2;
