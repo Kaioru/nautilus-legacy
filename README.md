@@ -1,30 +1,25 @@
 # Nautilus [![CircleCI](https://circleci.com/gh/Kaioru/nautilus.svg?style=shield&circle-token=a552425db0e34ff7d0d696b421389cc25614b5d6)](https://circleci.com/gh/Kaioru/nautilus)
 Nautilus is a modular server emulator for a certain online game.
 
-## Setup
-### IntelliJ IDEA
-#### Step 1
-Clone the repository with `git clone https://github.com/kaioru/nautilus`
-#### Step 2
-Open up IntelliJ IDEA and import the project with Maven.
-#### Step 3
-Download and/or follow the guides listed below
-* [Lombok](https://plugins.jetbrains.com/plugin/6317-lombok-plugin)
-* [Hibernate Metamodel Generator](https://docs.jboss.org/hibernate/orm/5.0/topical/html/metamodelgen/MetamodelGenerator.html)
-#### Step 4
-Use the `mvn clean package` command to test for any build errors.
-#### Step 5
-Aaaand you're set, Happy coding~
+## Features
+**Distributed Computing** - Nautilus makes use of Java's RMI API to have a distributed architecture which allows server administrators to easily scale the service depending on the load.
 
-## Architecture
-The Nautilus is divided into multiple cluster and shards.
-### World
-A center cluster that handles shard connections and heartbeat.
-Multiple world clusters can be started for multi-world.
-### Login
-The login shard handles authentication, world, channel and character selection.
-A login shard can be connected to multiple world clusters to allow multi-world.
-### Channel
-The channel shard handles game-play and migration between neighbour channels.
+**Flexibility** - Need a 2nd-level cache for your database connections? Or a database connection pool like HikariCP? Just edit the config files, no additional work required!
+
+**Modular** - Use specific parts of Nautilus in your application without the junk you don't need.
+
+## Building/Developing
+### Step 1
+Clone the repository with `git clone https://github.com/kaioru/nautilus`.
+### Step 2
+Import the cloned repository as a Maven project in your preferred IDE.
+### Step 3
+Download and configure your IDE for the following:
+* [Project Lombok](https://projectlombok.org/)
+* [Hibernate Metamodel Generator](http://docs.jboss.org/hibernate/orm/5.0/topical/html/metamodelgen/MetamodelGenerator.html)
+### Step 4
+Use the `mvn install` command to download any missing dependencies.
+
+Aaand.. you're set!
 
 This project is for educational purposes only.
