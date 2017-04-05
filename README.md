@@ -2,7 +2,7 @@
 Nautilus is a modular server emulator for a certain online game.
 
 ## Features
-**Distributed Computing** - Nautilus makes use of Java's RMI API to have a distributed architecture which allows server administrators to easily scale the service depending on the load.
+**Distributed** - Nautilus makes use of Java's RMI API to have a distributed architecture which allows server administrators to easily scale the service depending on the load.
 
 **Flexibility** - Need a 2nd-level cache for your database connections? Or a database connection pool like HikariCP? Just edit the config files, no additional work required!
 
@@ -21,5 +21,3 @@ Download and configure your IDE for the following:
 Use the `mvn install` command to download any missing dependencies.
 
 Aaand.. you're set!
-
-This project is for educational purposes only.
