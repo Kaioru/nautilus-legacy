@@ -1,6 +1,7 @@
 package co.kaioru.nautilus.channel.handler;
 
 import co.kaioru.nautilus.channel.ChannelServerApplication;
+import co.kaioru.nautilus.channel.packet.GameStructures;
 import co.kaioru.nautilus.server.game.ChannelServer;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.migration.IServerMigration;
@@ -22,7 +23,7 @@ public class MigrateInHandler implements IPacketHandler {
 					user.setChannelServer(channelServer);
 					user.migrateIn(channelServer, characterId);
 
-					
+					user.sendPacket(GameStructures.getCharacterInformation(user));
 					return;
 				}
 			} catch (Exception e) {

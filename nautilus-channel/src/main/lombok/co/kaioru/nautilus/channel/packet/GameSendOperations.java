@@ -4,7 +4,7 @@ import co.kaioru.nautilus.core.util.IValue;
 
 public enum GameSendOperations implements IValue<Integer> {
 
-	;
+	SET_FIELD(0x5C);
 
 	private final int value;
 
