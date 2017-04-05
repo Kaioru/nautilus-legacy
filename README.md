@@ -23,7 +23,7 @@ Use the `mvn install` command to download any missing dependencies.
 Aaand.. you're set!
 
 ## Acknowledgements
-* [@ddolpali]() - Random advice and stufferinos.
+* [@ddolpali](https://github.com/ddolpali) - Random advice and stufferinos.
 * [Zygon (RaGEZONE)](http://forum.ragezone.com/members/515335.html) - For the Desu project which is referenced when making this project.
 * [kevintjuh93 (RaGEZONE)](http://forum.ragezone.com/members/501793.html) - For the MoopleDEV project which is referenced when making this project.
 
