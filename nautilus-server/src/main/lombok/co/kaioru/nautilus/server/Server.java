@@ -110,6 +110,19 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									channel.attr(RemoteUser.USER_KEY).set(user);
 									channel.attr(RemoteUser.RECV_CRYPTO_KEY).set(new MapleCrypto(cipher, majorVersion, riv));
 									channel.attr(RemoteUser.SEND_CRYPTO_KEY).set(new MapleCrypto(cipher, majorVersion, siv));
+									log.debug("Opened connection with {} > {}", channel.remoteAddress(), channel.localAddress());
+								}
+
+								@Override
+								public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+									super.channelInactive(ctx);
+
+									Channel channel = ctx.channel();
+									RemoteUser user = channel.attr(RemoteUser.USER_KEY).get();
+
+									user.close();
+									channelGroup.remove(channel);
+									log.debug("Closed connection with {} > {}", channel.remoteAddress(), channel.localAddress());
 								}
 
 								@Override
@@ -129,17 +142,6 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									} else {
 										log.warn("No packet handlers found for operation code {}", operation);
 									}
-								}
-
-								@Override
-								public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-									super.channelInactive(ctx);
-
-									Channel channel = ctx.channel();
-									RemoteUser user = channel.attr(RemoteUser.USER_KEY).get();
-
-									user.close();
-									channelGroup.remove(channel);
 								}
 
 							},
