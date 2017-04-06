@@ -39,13 +39,13 @@ import java.util.Set;
 @Slf4j
 public abstract class Server<C extends ICluster, CO extends ServerConfig> extends Shard<C, CO> implements IServer<C, CO> {
 
+	private final IRemoteUserFactory remoteUserFactory;
+	private final Map<Integer, IPacketHandler> handlers;
+	private final Set<IServerMigration> migrations;
+
 	private Channel channel;
 	private ChannelGroup channelGroup;
 	private EventLoopGroup bossGroup, workerGroup;
-
-	private IRemoteUserFactory remoteUserFactory;
-	private Map<Integer, IPacketHandler> handlers;
-	private Set<IServerMigration> migrations;
 
 	public Server(CO config, IRemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
 		super(config, entityManagerFactory);
