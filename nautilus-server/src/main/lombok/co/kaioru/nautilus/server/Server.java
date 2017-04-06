@@ -137,7 +137,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 										if (handler.validate(user))
 											handler.handle(user, reader);
 										log.debug("Handled operation code {} with {}",
-											operation,
+											Integer.toHexString(operation),
 											handler.getClass().getSimpleName());
 									} else {
 										log.warn("No packet handlers found for operation code {}", Integer.toHexString(operation));
