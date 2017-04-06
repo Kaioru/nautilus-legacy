@@ -3,10 +3,8 @@ package co.kaioru.nautilus.crypto.maple;
 import co.kaioru.nautilus.crypto.ICrypto;
 import lombok.Getter;
 import lombok.Setter;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 
 import static co.kaioru.nautilus.crypto.maple.MapleBitTool.multiplyBytes;
@@ -38,12 +36,11 @@ public class MapleCrypto implements ICrypto {
 	private short gVersion, sVersion, rVersion;
 	private byte[] iv;
 
-	public MapleCrypto(short v, byte[] key, byte[] iv) throws GeneralSecurityException {
+	public MapleCrypto(Cipher cipher, short v, byte[] iv) throws GeneralSecurityException {
+		this.cipher = cipher;
 		this.gVersion = v;
 		this.sVersion = (short) ((((0xFFFF - v) >> 8) & 0xFF) | (((0xFFFF - v) << 8) & 0xFF00));
 		this.rVersion = (short) (((v >> 8) & 0xFF) | ((v << 8) & 0xFF00));
-		this.cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
-		this.cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
 		this.iv = iv;
 	}
 

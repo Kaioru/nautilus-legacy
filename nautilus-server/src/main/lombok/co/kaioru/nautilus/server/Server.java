@@ -15,7 +15,6 @@ import co.kaioru.nautilus.server.packet.*;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -26,11 +25,13 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.persistence.EntityManagerFactory;
 import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,105 +57,112 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 	@Override
 	public void run() {
-		super.run();
+		try {
+			super.run();
 
-		short majorVersion = getConfig().getMapleMajorVersion();
-		short minorVersion = getConfig().getMapleMinorVersion();
-		ICrypto crypto = new ShandaCrypto();
+			short majorVersion = getConfig().getMapleMajorVersion();
+			short minorVersion = getConfig().getMapleMinorVersion();
+			ICrypto crypto = new ShandaCrypto();
 
-		this.channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-		this.bossGroup = new NioEventLoopGroup(2);
-		this.workerGroup = new NioEventLoopGroup(4);
+			this.channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+			this.bossGroup = new NioEventLoopGroup(2);
+			this.workerGroup = new NioEventLoopGroup(4);
 
-		this.channel = new ServerBootstrap()
-			.group(bossGroup, workerGroup)
-			.channel(NioServerSocketChannel.class)
-			.childHandler(new ChannelInitializer<SocketChannel>() {
+			byte[] key = {
+				0x13, 0x00, 0x00, 0x00,
+				0x08, 0x00, 0x00, 0x00,
+				0x06, 0x00, 0x00, 0x00,
+				(byte) 0xB4, 0x00, 0x00, 0x00,
+				0x1B, 0x00, 0x00, 0x00,
+				0x0F, 0x00, 0x00, 0x00,
+				0x33, 0x00, 0x00, 0x00,
+				0x52, 0x00, 0x00, 0x00};
+			Cipher cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
+			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
 
-				@Override
-				protected void initChannel(SocketChannel socketChannel) throws Exception {
-					socketChannel.pipeline().addLast(
-						new PacketDecoder(crypto),
-						new ChannelInboundHandlerAdapter() {
+			this.channel = new ServerBootstrap()
+				.group(bossGroup, workerGroup)
+				.channel(NioServerSocketChannel.class)
+				.childHandler(new ChannelInitializer<SocketChannel>() {
 
-							@Override
-							public void channelActive(ChannelHandlerContext ctx) throws GeneralSecurityException {
-								byte[] riv = {70, 114, (byte) (Math.random() * 255), 82};
-								byte[] siv = {82, 48, (byte) (Math.random() * 255), 115};
-								byte[] key = {
-									0x13, 0x00, 0x00, 0x00,
-									0x08, 0x00, 0x00, 0x00,
-									0x06, 0x00, 0x00, 0x00,
-									(byte) 0xB4, 0x00, 0x00, 0x00,
-									0x1B, 0x00, 0x00, 0x00,
-									0x0F, 0x00, 0x00, 0x00,
-									0x33, 0x00, 0x00, 0x00,
-									0x52, 0x00, 0x00, 0x00};
-								Channel channel = ctx.channel();
-								RemoteUser user = remoteUserFactory.create(channel);
+					@Override
+					protected void initChannel(SocketChannel socketChannel) throws Exception {
+						socketChannel.pipeline().addLast(
+							new PacketDecoder(crypto),
+							new ChannelInboundHandlerAdapter() {
 
-								PacketBuilder.create(0x0E)
-									.writeShort(majorVersion)
-									.writeString(String.valueOf(minorVersion))
-									.writeBytes(riv)
-									.writeBytes(siv)
-									.writeByte((byte) 8)
-									.buildAndFlush(channel);
+								@Override
+								public void channelActive(ChannelHandlerContext ctx) throws GeneralSecurityException {
+									byte[] riv = {70, 114, (byte) (Math.random() * 255), 82};
+									byte[] siv = {82, 48, (byte) (Math.random() * 255), 115};
+									Channel channel = ctx.channel();
+									RemoteUser user = remoteUserFactory.create(channel);
 
-								channelGroup.add(channel);
-								channel.attr(RemoteUser.USER_KEY).set(user);
-								channel.attr(RemoteUser.RECV_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, riv));
-								channel.attr(RemoteUser.SEND_CRYPTO_KEY).set(new MapleCrypto(majorVersion, key, siv));
-							}
+									PacketBuilder.create(0x0E)
+										.writeShort(majorVersion)
+										.writeString(String.valueOf(minorVersion))
+										.writeBytes(riv)
+										.writeBytes(siv)
+										.writeByte((byte) 8)
+										.buildAndFlush(channel);
 
-							@Override
-							public void channelRead(ChannelHandlerContext ctx, Object msg) {
-								IPacketReader reader = new PacketReader((Packet) msg);
-								RemoteUser user = ctx.channel().attr(RemoteUser.USER_KEY).get();
-
-								int operation = reader.readShort();
-								IPacketHandler handler = handlers.get(operation);
-
-								if (handler != null) {
-									if (handler.validate(user))
-										handler.handle(user, reader);
-									log.debug("Handled operation code {} with {}",
-										operation,
-										handler.getClass().getSimpleName());
-								} else {
-									log.warn("No packet handlers found for operation code {}", operation);
+									channelGroup.add(channel);
+									channel.attr(RemoteUser.USER_KEY).set(user);
+									channel.attr(RemoteUser.RECV_CRYPTO_KEY).set(new MapleCrypto(cipher, majorVersion, riv));
+									channel.attr(RemoteUser.SEND_CRYPTO_KEY).set(new MapleCrypto(cipher, majorVersion, siv));
 								}
-							}
 
-							@Override
-							public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-								super.channelInactive(ctx);
+								@Override
+								public void channelRead(ChannelHandlerContext ctx, Object msg) {
+									IPacketReader reader = new PacketReader((Packet) msg);
+									RemoteUser user = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
-								Channel channel = ctx.channel();
-								RemoteUser user = channel.attr(RemoteUser.USER_KEY).get();
+									int operation = reader.readShort();
+									IPacketHandler handler = handlers.get(operation);
 
-								user.close();
-								channelGroup.remove(channel);
-							}
+									if (handler != null) {
+										if (handler.validate(user))
+											handler.handle(user, reader);
+										log.debug("Handled operation code {} with {}",
+											operation,
+											handler.getClass().getSimpleName());
+									} else {
+										log.warn("No packet handlers found for operation code {}", operation);
+									}
+								}
 
-						},
-						new PacketEncoder(crypto)
-					);
-				}
+								@Override
+								public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+									super.channelInactive(ctx);
 
-			})
-			.childOption(ChannelOption.TCP_NODELAY, true)
-			.childOption(ChannelOption.SO_KEEPALIVE, true)
-			.bind(getConfig().getHost(), getConfig().getPort())
-			.channel();
+									Channel channel = ctx.channel();
+									RemoteUser user = channel.attr(RemoteUser.USER_KEY).get();
 
-		log.info("{} started on {}:{}", getConfig().getName(), getConfig().getHost(), getConfig().getPort());
-		channel.closeFuture()
-			.addListener((ChannelFutureListener) channelFuture -> {
-				workerGroup.shutdownGracefully();
-				bossGroup.shutdownGracefully();
-				channelGroup.disconnect();
-			});
+									user.close();
+									channelGroup.remove(channel);
+								}
+
+							},
+							new PacketEncoder(crypto)
+						);
+					}
+
+				})
+				.childOption(ChannelOption.TCP_NODELAY, true)
+				.childOption(ChannelOption.SO_KEEPALIVE, true)
+				.bind(getConfig().getHost(), getConfig().getPort())
+				.channel();
+
+			log.info("{} started on {}:{}", getConfig().getName(), getConfig().getHost(), getConfig().getPort());
+			channel.closeFuture()
+				.addListener((ChannelFutureListener) channelFuture -> {
+					workerGroup.shutdownGracefully();
+					bossGroup.shutdownGracefully();
+					channelGroup.disconnect();
+				});
+		} catch (GeneralSecurityException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void registerPacketHandler(IValue<Integer> operation, IPacketHandler handler) {
