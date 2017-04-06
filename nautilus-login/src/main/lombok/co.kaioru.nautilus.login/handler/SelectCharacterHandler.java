@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 
 public class SelectCharacterHandler implements IPacketHandler {
 
+
 	@Override
 	public void handle(RemoteUser user, IPacketReader reader) {
 		int characterId = reader.readInt();
@@ -23,14 +24,17 @@ public class SelectCharacterHandler implements IPacketHandler {
 				.findFirst()
 				.orElseThrow(NoSuchElementException::new);
 			IChannelServer server = user.getChannelServer();
+
+			user.setCharacter(character);
+
 			InetAddress address = InetAddress.getByName(server.getConfig().getHost());
 			short port = server.getConfig().getPort();
 
-			user.setCharacter(character);
 			user.migrateOut(server);
 			user.sendPacket(LoginStructures.getSelectCharacterSuccess(address, port, characterId));
 		} catch (Exception e) {
 			e.printStackTrace();
+			user.close();
 		}
 	}
 

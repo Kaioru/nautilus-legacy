@@ -4,7 +4,6 @@ import co.kaioru.nautilus.login.handler.*;
 import co.kaioru.nautilus.orm.auth.BasicAuthenticator;
 import co.kaioru.nautilus.server.game.LoginServer;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
-import co.kaioru.nautilus.server.game.user.IRemoteUserFactory;
 import co.kaioru.nautilus.server.game.user.RemoteUserFactory;
 import com.google.gson.Gson;
 import lombok.Getter;
@@ -57,6 +56,7 @@ public class LoginServerApplication {
 			server.registerPacketHandler(WORLD_REQUEST, new WorldInfoRequestHandler());
 			server.registerPacketHandler(LOGOUT_WORLD, new LogoutWorldHandler());
 			server.registerPacketHandler(VIEW_ALL_CHAR, new ViewAllCharHandler());
+			server.registerPacketHandler(SELECT_CHARACTER_BY_VAC, new SelectCharacterByVACHandler());
 			server.registerPacketHandler(VAC_FLAG_SET, new VACFlagSetHandler());
 			server.registerPacketHandler(SELECT_CHARACTER, new SelectCharacterHandler());
 			server.registerPacketHandler(CHECK_DUPLICATED_ID, new CheckDuplicatedIDHandler(entityManager));
