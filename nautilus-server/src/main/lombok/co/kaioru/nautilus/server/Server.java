@@ -140,7 +140,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 											operation,
 											handler.getClass().getSimpleName());
 									} else {
-										log.warn("No packet handlers found for operation code {}", operation);
+										log.warn("No packet handlers found for operation code {}", Integer.toHexString(operation));
 									}
 								}
 
