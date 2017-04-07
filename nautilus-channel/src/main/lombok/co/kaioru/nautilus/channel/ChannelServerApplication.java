@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.channel;
 
+import co.kaioru.nautilus.channel.field.FieldManager;
 import co.kaioru.nautilus.channel.handler.MigrateInHandler;
 import co.kaioru.nautilus.server.game.ChannelServer;
 import co.kaioru.nautilus.server.game.config.ChannelConfig;
@@ -20,13 +21,13 @@ import java.io.IOException;
 import java.util.Properties;
 
 @Slf4j
-public class ChannelServerApplication  {
+public class ChannelServerApplication {
 
 	@Getter
 	@Setter
 	private static ChannelServer instance;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		String configPath = "config.json";
 		String databasePath = "database.properties";
 
@@ -40,10 +41,14 @@ public class ChannelServerApplication  {
 			BufferedReader br = new BufferedReader(new FileReader(configPath));
 			EntityManager entityManager = entityManagerFactory.createEntityManager();
 			ChannelConfig config = new Gson().fromJson(br, ChannelConfig.class);
+
+			FieldManager fieldManager = FieldManager.load("data/fields.bin");
+
 			ChannelServer server = new ChannelServer(
 				config,
 				new RemoteUserFactory(entityManager),
-				entityManagerFactory);
+				entityManagerFactory,
+				fieldManager);
 
 			server.registerPacketHandler(SocketRecvOperations.MIGRATE_IN, new MigrateInHandler());
 
