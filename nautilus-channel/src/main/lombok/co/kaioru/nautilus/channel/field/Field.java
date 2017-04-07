@@ -14,9 +14,9 @@ public class Field implements IField {
 	private final FieldTemplate template;
 	private final IFieldInstance fieldInstance;
 
-	public Field(FieldTemplate template, IFieldInstance fieldInstance) {
+	public Field(FieldTemplate template) {
 		this.template = template;
-		this.fieldInstance = fieldInstance;
+		this.fieldInstance = new FieldInstance(this);
 	}
 
 	@Override
