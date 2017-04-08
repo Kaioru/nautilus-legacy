@@ -33,12 +33,12 @@ public class FieldSplit implements IFieldSplit {
 	}
 
 	@Override
-	public boolean enter(User user) {
+	public boolean enter(User user, int spawnPoint) {
 		return false;
 	}
 
 	@Override
-	public boolean leave(User user) {
+	public boolean leave(User user, int spawnPoint) {
 		return false;
 	}
 

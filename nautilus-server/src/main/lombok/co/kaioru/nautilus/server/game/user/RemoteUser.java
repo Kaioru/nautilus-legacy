@@ -3,10 +3,8 @@ package co.kaioru.nautilus.server.game.user;
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.server.IServer;
-import co.kaioru.nautilus.server.config.ServerConfig;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
-import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.packet.IPacket;
 import co.kaioru.nautilus.server.packet.IPacketWriter;
 import io.netty.channel.Channel;
@@ -14,9 +12,6 @@ import io.netty.util.AttributeKey;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Closeable;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Getter
 @Setter

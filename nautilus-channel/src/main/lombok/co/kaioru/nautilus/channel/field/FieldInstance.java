@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.channel.field;
 
+import co.kaioru.nautilus.channel.packet.GameStructures;
 import co.kaioru.nautilus.core.field.IField;
 import co.kaioru.nautilus.core.field.IFieldInstance;
 import co.kaioru.nautilus.core.field.IFieldSplit;
@@ -57,12 +58,12 @@ public class FieldInstance implements IFieldInstance {
 	}
 
 	@Override
-	public boolean enter(User user) {
+	public boolean enter(User user, int spawnPoint) {
 		return false;
 	}
 
 	@Override
-	public boolean leave(User user) {
+	public boolean leave(User user, int spawnPoint) {
 		return false;
 	}
 

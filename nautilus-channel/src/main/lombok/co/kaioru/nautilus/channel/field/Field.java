@@ -20,13 +20,13 @@ public class Field implements IField {
 	}
 
 	@Override
-	public boolean enter(User user) {
-		return fieldInstance.enter(user);
+	public boolean enter(User user, int spawnPoint) {
+		return fieldInstance.enter(user, spawnPoint);
 	}
 
 	@Override
-	public boolean leave(User user) {
-		return fieldInstance.leave(user);
+	public boolean leave(User user, int spawnPoint) {
+		return fieldInstance.leave(user, spawnPoint);
 	}
 
 }

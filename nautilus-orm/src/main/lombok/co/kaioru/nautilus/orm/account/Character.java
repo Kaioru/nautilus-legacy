@@ -34,6 +34,9 @@ public class Character extends Model {
 
 	@Column
 	private int face, hair;
+
+	@Column
+	private int fieldId, spawnPoint;
 /*
 	@Fetch(FetchMode.SELECT)
 	@OneToOne(mappedBy = "character", fetch = FetchType.EAGER, orphanRemoval = true)

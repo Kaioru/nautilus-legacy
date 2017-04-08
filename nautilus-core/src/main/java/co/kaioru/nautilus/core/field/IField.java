@@ -9,8 +9,8 @@ public interface IField {
 
 	IFieldInstance getFieldInstance();
 
-	boolean enter(User user);
+	boolean enter(User user, int spawnPoint);
 
-	boolean leave(User user);
+	boolean leave(User user, int spawnPoint);
 
 }

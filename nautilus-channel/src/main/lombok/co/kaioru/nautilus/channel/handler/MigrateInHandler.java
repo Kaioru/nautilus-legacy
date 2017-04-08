@@ -2,7 +2,9 @@ package co.kaioru.nautilus.channel.handler;
 
 import co.kaioru.nautilus.channel.ChannelServerApplication;
 import co.kaioru.nautilus.channel.packet.GameStructures;
+import co.kaioru.nautilus.core.field.IField;
 import co.kaioru.nautilus.server.game.ChannelServer;
+import co.kaioru.nautilus.server.game.manager.IFieldManager;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.packet.IPacketHandler;
@@ -23,8 +25,13 @@ public class MigrateInHandler implements IPacketHandler {
 					user.setChannelServer(channelServer);
 					user.migrateIn(channelServer, characterId);
 
-					user.sendPacket(GameStructures.getCharacterInformation(user));
-					return;
+					IFieldManager fieldManager = channelServer.getFieldManager();
+					IField field = fieldManager.getField(user.getCharacter().getFieldId());
+
+					if (field.enter(user, user.getCharacter().getSpawnPoint())) {
+						user.sendPacket(GameStructures.getCharacterInformation(user));
+						return;
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
