@@ -1,6 +1,6 @@
 package co.kaioru.nautilus.channel.field;
 
-import co.kaioru.nautilus.channel.field.object.CharacterFieldObject;
+import co.kaioru.nautilus.channel.field.object.UserFieldObject;
 import co.kaioru.nautilus.core.field.IField;
 import co.kaioru.nautilus.core.field.IFieldInstance;
 import co.kaioru.nautilus.core.field.IFieldObject;
@@ -65,7 +65,7 @@ public class FieldInstance implements IFieldInstance {
 		Map<Integer, FieldPortalTemplate> portals = getTemplate().getPortals();
 		FieldPortalTemplate targetPortal = portals.getOrDefault(spawnPoint, portals.get(0));
 
-		user.setFieldObject(new CharacterFieldObject(this, user));
+		user.setFieldObject(new UserFieldObject(this, user));
 
 		if (targetPortal != null) {
 			IFieldObject fieldObject = user.getFieldObject();
