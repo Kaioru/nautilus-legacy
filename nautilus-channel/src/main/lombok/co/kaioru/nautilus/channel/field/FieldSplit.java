@@ -3,14 +3,10 @@ package co.kaioru.nautilus.channel.field;
 import co.kaioru.nautilus.core.field.IFieldInstance;
 import co.kaioru.nautilus.core.field.IFieldObject;
 import co.kaioru.nautilus.core.field.IFieldSplit;
-import co.kaioru.nautilus.core.field.template.FieldTemplate;
-import co.kaioru.nautilus.core.user.User;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -32,12 +28,20 @@ public class FieldSplit implements IFieldSplit {
 	@Override
 	public boolean enter(IFieldObject fieldObject) {
 		fieldObjects.add(fieldObject);
+		if (fieldObject instanceof FieldObject) {
+			FieldObject object = (FieldObject) fieldObject;
+			object.sendPacketRemote(object.getEnterFieldPacket());
+		}
 		return true;
 	}
 
 	@Override
 	public boolean leave(IFieldObject fieldObject) {
 		fieldObjects.remove(fieldObject);
+		if (fieldObject instanceof FieldObject) {
+			FieldObject object = (FieldObject) fieldObject;
+			object.sendPacketRemote(object.getLeaveFieldPacket());
+		}
 		return true;
 	}
 

@@ -9,12 +9,12 @@ import co.kaioru.nautilus.server.packet.PacketBuilder;
 import java.rmi.RemoteException;
 import java.time.Instant;
 
-public class GameStructures {
+public class UserStructures {
 
 	public static IPacket getCharacterInformation(RemoteUser user) throws RemoteException {
 		Character character = user.getCharacter();
 
-		return PacketBuilder.create(GameSendOperations.SET_FIELD)
+		return PacketBuilder.create(UserSendOperations.SET_FIELD)
 			.writeInt(user.getChannelServer().getConfig().getId())
 			.writeBool(true)
 			.writeBool(true)

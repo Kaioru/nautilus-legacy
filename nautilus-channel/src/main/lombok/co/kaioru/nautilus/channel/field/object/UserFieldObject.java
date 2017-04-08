@@ -5,6 +5,7 @@ import co.kaioru.nautilus.core.field.IFieldInstance;
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
+import co.kaioru.nautilus.server.packet.IPacket;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,21 @@ public class UserFieldObject extends FieldObject {
 		super(fieldInstance);
 		this.user = user;
 		this.character = user.getCharacter();
+	}
+
+	@Override
+	public IPacket getEnterFieldPacket() {
+		return null;
+	}
+
+	@Override
+	public IPacket getLeaveFieldPacket() {
+		return null;
+	}
+
+	public void sendPacketLocal(IPacket packet) {
+		if (user instanceof RemoteUser)
+			((RemoteUser) user).sendPacket(packet);
 	}
 
 }

@@ -1,7 +1,7 @@
 package co.kaioru.nautilus.channel.handler;
 
 import co.kaioru.nautilus.channel.ChannelServerApplication;
-import co.kaioru.nautilus.channel.packet.GameStructures;
+import co.kaioru.nautilus.channel.packet.UserStructures;
 import co.kaioru.nautilus.core.field.IField;
 import co.kaioru.nautilus.server.game.ChannelServer;
 import co.kaioru.nautilus.server.game.manager.IFieldManager;
@@ -29,7 +29,7 @@ public class MigrateInHandler implements IPacketHandler {
 					IField field = fieldManager.getField(user.getCharacter().getFieldId());
 
 					if (field.enter(user, user.getCharacter().getSpawnPoint())) {
-						user.sendPacket(GameStructures.getCharacterInformation(user));
+						user.sendPacket(UserStructures.getCharacterInformation(user));
 						return;
 					}
 				}
