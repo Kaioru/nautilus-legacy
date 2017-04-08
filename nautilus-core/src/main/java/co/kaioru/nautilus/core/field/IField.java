@@ -11,6 +11,6 @@ public interface IField {
 
 	boolean enter(User user, int spawnPoint);
 
-	boolean leave(User user, int spawnPoint);
+	boolean leave(User user);
 
 }

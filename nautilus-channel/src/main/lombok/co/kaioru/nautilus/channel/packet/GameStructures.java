@@ -51,8 +51,8 @@ public class GameStructures {
 			.writeInt(0)
 			.writeShort(0)
 			.writeInt(0)
-			.writeInt(0)
-			.writeByte(0)
+			.writeInt(character.getFieldId())
+			.writeByte(character.getSpawnPoint())
 			.writeInt(0)
 			.writeByte(100) // Friend List capacity
 

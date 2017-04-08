@@ -12,10 +12,10 @@ import lombok.Setter;
 @Setter
 public class CharacterFieldObject extends FieldObject {
 
-	private final RemoteUser user;
+	private final User user;
 	private final Character character;
 
-	public CharacterFieldObject(IFieldInstance fieldInstance, RemoteUser user) {
+	public CharacterFieldObject(IFieldInstance fieldInstance, User user) {
 		super(fieldInstance);
 		this.user = user;
 		this.character = user.getCharacter();

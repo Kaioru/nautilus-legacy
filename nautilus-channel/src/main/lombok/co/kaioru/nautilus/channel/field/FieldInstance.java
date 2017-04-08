@@ -1,9 +1,11 @@
 package co.kaioru.nautilus.channel.field;
 
-import co.kaioru.nautilus.channel.packet.GameStructures;
+import co.kaioru.nautilus.channel.field.object.CharacterFieldObject;
 import co.kaioru.nautilus.core.field.IField;
 import co.kaioru.nautilus.core.field.IFieldInstance;
+import co.kaioru.nautilus.core.field.IFieldObject;
 import co.kaioru.nautilus.core.field.IFieldSplit;
+import co.kaioru.nautilus.core.field.template.FieldPortalTemplate;
 import co.kaioru.nautilus.core.field.template.FieldTemplate;
 import co.kaioru.nautilus.core.user.User;
 import com.google.common.collect.Lists;
@@ -12,6 +14,7 @@ import lombok.Setter;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -59,12 +62,45 @@ public class FieldInstance implements IFieldInstance {
 
 	@Override
 	public boolean enter(User user, int spawnPoint) {
+		Map<Integer, FieldPortalTemplate> portals = getTemplate().getPortals();
+		FieldPortalTemplate targetPortal = portals.getOrDefault(spawnPoint, portals.get(0));
+
+		user.setFieldObject(new CharacterFieldObject(this, user));
+
+		if (targetPortal != null) {
+			IFieldObject fieldObject = user.getFieldObject();
+			fieldObject.getPosition().setLocation(targetPortal.getPosition());
+			return migrate(fieldObject);
+		}
 		return false;
 	}
 
 	@Override
-	public boolean leave(User user, int spawnPoint) {
+	public boolean leave(User user) {
+		IFieldObject fieldObject = user.getFieldObject();
+
+		if (fieldObject != null) {
+			fieldObject.getFieldSplits().forEach(s -> s.leave(fieldObject));
+			return true;
+		}
 		return false;
+	}
+
+	public boolean migrate(IFieldObject fieldObject) {
+		Point target = fieldObject.getPosition();
+		IFieldSplit split = getSplitFromPoint(target);
+		List<IFieldSplit> oldSplits = fieldObject.getFieldSplits();
+		List<IFieldSplit> newSplits = getEnclosingSplit(split);
+
+		newSplits.stream()
+			.filter(s -> !oldSplits.contains(s))
+			.forEach(s -> s.enter(fieldObject));
+		oldSplits.stream()
+			.filter(s -> !newSplits.contains(s))
+			.forEach(s -> s.leave(fieldObject));
+		fieldObject.getFieldSplits().clear();
+		fieldObject.getFieldSplits().addAll(newSplits);
+		return true;
 	}
 
 	public IFieldSplit getSplitFromPoint(Point point) {

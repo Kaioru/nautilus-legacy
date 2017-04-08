@@ -1,15 +1,19 @@
 package co.kaioru.nautilus.core.field;
 
-import java.util.List;
+import java.util.Set;
 
-public interface IFieldSplit extends IField {
+public interface IFieldSplit {
 
-	List<IFieldObject> getFieldObjects();
+	Set<IFieldObject> getFieldObjects();
 
 	int getRow();
 
 	int getCol();
 
 	int getIndex();
+
+	boolean enter(IFieldObject object);
+
+	boolean leave(IFieldObject object);
 
 }

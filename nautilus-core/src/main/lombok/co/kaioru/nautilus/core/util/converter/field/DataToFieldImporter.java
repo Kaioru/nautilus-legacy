@@ -20,8 +20,9 @@ public class DataToFieldImporter extends NXImporter<Map<Integer, FieldTemplate>>
 				int id = Integer.parseInt(c.getName().substring(0, 9));
 				IDataNode info = c.getChild("info");
 				IDataNode foothold = c.getChild("foothold");
+				IDataNode portal = c.getChild("portal");
 
-				return new FieldTemplate(id, info, foothold);
+				return new FieldTemplate(id, info, foothold, portal);
 			})
 			.collect(Collectors.toMap(FieldTemplate::getTemplateID, t -> t));
 	}

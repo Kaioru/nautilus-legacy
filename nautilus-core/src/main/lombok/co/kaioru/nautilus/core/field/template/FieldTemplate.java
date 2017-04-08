@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -20,9 +22,12 @@ public class FieldTemplate implements ITemplate {
 	private final Point leftTop, fieldSize;
 	private final int mobCapacityMin, mobCapacityMax;
 
+	private final Map<Integer, FieldPortalTemplate> portals;
+
 	public FieldTemplate(final int templateID,
 						 final IDataNode info,
-						 final IDataNode foothold) {
+						 final IDataNode foothold,
+						 final IDataNode portal) {
 		this.templateID = templateID;
 		this.returnMap = info.getInt("returnMap", 999999999);
 
@@ -91,6 +96,11 @@ public class FieldTemplate implements ITemplate {
 
 		this.mobCapacityMin = mobCapacity;
 		this.mobCapacityMax = mobCapacity * 2;
+
+		this.portals = portal.getChildren()
+			.stream()
+			.map(c -> new FieldPortalTemplate(Integer.parseInt(c.getName()), c))
+			.collect(Collectors.toMap(FieldPortalTemplate::getTemplateID, p -> p));
 	}
 
 }

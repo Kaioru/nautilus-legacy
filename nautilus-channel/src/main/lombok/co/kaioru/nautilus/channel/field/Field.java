@@ -25,8 +25,8 @@ public class Field implements IField {
 	}
 
 	@Override
-	public boolean leave(User user, int spawnPoint) {
-		return fieldInstance.leave(user, spawnPoint);
+	public boolean leave(User user) {
+		return fieldInstance.leave(user);
 	}
 
 }
