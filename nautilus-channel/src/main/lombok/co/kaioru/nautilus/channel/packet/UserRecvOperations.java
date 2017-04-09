@@ -4,7 +4,8 @@ import co.kaioru.nautilus.core.util.IValue;
 
 public enum UserRecvOperations implements IValue<Integer> {
 
-	USER_MOVE(0x26);
+	USER_MOVE(0x26),
+	USER_CHAT(0x2E);
 
 	private final int value;
 

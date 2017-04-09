@@ -26,7 +26,7 @@ public class UserStructures {
 			.writeInt(0)
 
 			.writeLong(-1)
-			.writeInt(character.getId())
+			.writeInt(user.getFieldObject().getObjectId())
 			.writeBytes(character.getName().substring(0, Math.min(13, character.getName().length())).getBytes()) // This is a lil' different..
 			.writeBytes(0x00, 13 - character.getName().length())
 			.writeByte(character.getGender())
@@ -97,6 +97,15 @@ public class UserStructures {
 
 			.writeLong(TimeUtil.getTimestamp(Instant.now().toEpochMilli()))
 
+			.build();
+	}
+
+	public static IPacket getUserChat(int fieldObjectId, String message, boolean gm, boolean show) {
+		return PacketBuilder.create(UserSendOperations.USER_CHAT)
+			.writeInt(fieldObjectId)
+			.writeBool(gm)
+			.writeString(message)
+			.writeBool(show)
 			.build();
 	}
 

@@ -2,13 +2,12 @@ package co.kaioru.nautilus.channel;
 
 import co.kaioru.nautilus.channel.field.FieldManager;
 import co.kaioru.nautilus.channel.handler.MigrateInHandler;
+import co.kaioru.nautilus.channel.handler.user.UserChatHandler;
 import co.kaioru.nautilus.channel.handler.user.UserMoveHandler;
-import co.kaioru.nautilus.channel.packet.UserRecvOperations;
 import co.kaioru.nautilus.server.game.ChannelServer;
 import co.kaioru.nautilus.server.game.config.ChannelConfig;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
 import co.kaioru.nautilus.server.game.user.RemoteUserFactory;
-import co.kaioru.nautilus.server.packet.game.SocketRecvOperations;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import static co.kaioru.nautilus.channel.packet.UserRecvOperations.USER_CHAT;
 import static co.kaioru.nautilus.channel.packet.UserRecvOperations.USER_MOVE;
 import static co.kaioru.nautilus.server.packet.game.SocketRecvOperations.MIGRATE_IN;
 
@@ -57,6 +57,7 @@ public class ChannelServerApplication {
 
 			server.registerPacketHandler(MIGRATE_IN, new MigrateInHandler());
 			server.registerPacketHandler(USER_MOVE, new UserMoveHandler());
+			server.registerPacketHandler(USER_CHAT, new UserChatHandler());
 
 			setInstance(server);
 			server.run();
