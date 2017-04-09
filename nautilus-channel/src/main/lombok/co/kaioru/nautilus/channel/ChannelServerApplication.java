@@ -2,6 +2,8 @@ package co.kaioru.nautilus.channel;
 
 import co.kaioru.nautilus.channel.field.FieldManager;
 import co.kaioru.nautilus.channel.handler.MigrateInHandler;
+import co.kaioru.nautilus.channel.handler.user.UserMoveHandler;
+import co.kaioru.nautilus.channel.packet.UserRecvOperations;
 import co.kaioru.nautilus.server.game.ChannelServer;
 import co.kaioru.nautilus.server.game.config.ChannelConfig;
 import co.kaioru.nautilus.server.game.config.LoginConfig;
@@ -19,6 +21,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
+
+import static co.kaioru.nautilus.channel.packet.UserRecvOperations.USER_MOVE;
+import static co.kaioru.nautilus.server.packet.game.SocketRecvOperations.MIGRATE_IN;
 
 @Slf4j
 public class ChannelServerApplication {
@@ -50,7 +55,8 @@ public class ChannelServerApplication {
 				entityManagerFactory,
 				fieldManager);
 
-			server.registerPacketHandler(SocketRecvOperations.MIGRATE_IN, new MigrateInHandler());
+			server.registerPacketHandler(MIGRATE_IN, new MigrateInHandler());
+			server.registerPacketHandler(USER_MOVE, new UserMoveHandler());
 
 			setInstance(server);
 			server.run();
