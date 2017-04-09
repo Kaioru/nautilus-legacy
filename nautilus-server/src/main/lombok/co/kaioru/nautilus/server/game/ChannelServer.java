@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.server.game;
 
+import co.kaioru.nautilus.core.command.CommandRegistry;
 import co.kaioru.nautilus.server.Server;
 import co.kaioru.nautilus.server.game.config.ChannelConfig;
 import co.kaioru.nautilus.server.game.manager.IFieldManager;
@@ -12,6 +13,7 @@ import javax.persistence.EntityManagerFactory;
 public class ChannelServer extends Server<IWorldCluster, ChannelConfig> implements IChannelServer {
 
 	private final IFieldManager fieldManager;
+	private final CommandRegistry commandRegistry;
 
 	public ChannelServer(ChannelConfig config,
 						 IRemoteUserFactory remoteUserFactory,
@@ -19,6 +21,7 @@ public class ChannelServer extends Server<IWorldCluster, ChannelConfig> implemen
 						 IFieldManager fieldManager) {
 		super(config, remoteUserFactory, entityManagerFactory);
 		this.fieldManager = fieldManager;
+		this.commandRegistry = new CommandRegistry();
 	}
 
 }
