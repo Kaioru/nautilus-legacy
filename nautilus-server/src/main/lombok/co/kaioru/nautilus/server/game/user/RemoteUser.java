@@ -13,6 +13,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 public abstract class RemoteUser extends User {
@@ -26,6 +28,8 @@ public abstract class RemoteUser extends User {
 
 	private IWorldCluster worldCluster;
 	private IChannelServer channelServer;
+
+	private Instant lastAliveReq = Instant.now(), lastAliveAck = Instant.now();
 
 	public RemoteUser(Channel channel) {
 		this.channel = channel;

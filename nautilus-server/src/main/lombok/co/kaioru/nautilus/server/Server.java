@@ -12,6 +12,9 @@ import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.migration.ServerMigration;
 import co.kaioru.nautilus.server.packet.*;
+import co.kaioru.nautilus.server.packet.game.SocketRecvOperations;
+import co.kaioru.nautilus.server.packet.handler.AliveAckHandler;
+import co.kaioru.nautilus.server.task.ShardHeartbeatTask;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
@@ -34,6 +37,7 @@ import java.rmi.RemoteException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @Setter
@@ -154,6 +158,13 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 				.childOption(ChannelOption.SO_KEEPALIVE, true)
 				.bind(getConfig().getHost(), getConfig().getPort())
 				.channel();
+
+			registerPacketHandler(SocketRecvOperations.ALIVE_ACK, new AliveAckHandler());
+			getExecutor().scheduleAtFixedRate(
+				new ShardHeartbeatTask(channelGroup),
+				10, 10,
+				TimeUnit.SECONDS
+			);
 
 			log.info("{} started on {}:{}", getConfig().getName(), getConfig().getHost(), getConfig().getPort());
 			channel.closeFuture()
