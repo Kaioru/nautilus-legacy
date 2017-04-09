@@ -23,6 +23,8 @@ public abstract class FieldObject implements IFieldObject {
 	private final int objectId;
 	private final Point position;
 
+	private IFieldSplit fieldSplit;
+
 	public FieldObject(IFieldInstance fieldInstance) {
 		this.fieldInstance = fieldInstance;
 		this.fieldSplits = Lists.newArrayList();

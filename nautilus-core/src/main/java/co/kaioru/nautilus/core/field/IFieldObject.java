@@ -7,6 +7,10 @@ public interface IFieldObject {
 
 	IFieldInstance getFieldInstance();
 
+	IFieldSplit getFieldSplit();
+
+	void setFieldSplit(IFieldSplit fieldSplit);
+
 	List<IFieldSplit> getFieldSplits();
 
 	int getObjectId();

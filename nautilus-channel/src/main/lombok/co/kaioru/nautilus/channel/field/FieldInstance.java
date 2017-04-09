@@ -100,6 +100,7 @@ public class FieldInstance implements IFieldInstance {
 			.forEach(s -> s.leave(fieldObject));
 		fieldObject.getFieldSplits().clear();
 		fieldObject.getFieldSplits().addAll(newSplits);
+		fieldObject.setFieldSplit(split);
 		return true;
 	}
 
