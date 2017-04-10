@@ -36,9 +36,7 @@ public abstract class PacketDecoder extends ByteToMessageDecoder {
 				}
 			}
 		} else {
-			byte[] payload = new byte[in.readShort()];
-			in.readBytes(payload);
-			out.add(new PacketReader(Unpooled.copiedBuffer(payload)));
+			out.add(new PacketReader(Unpooled.copiedBuffer(in)));
 		}
 	}
 

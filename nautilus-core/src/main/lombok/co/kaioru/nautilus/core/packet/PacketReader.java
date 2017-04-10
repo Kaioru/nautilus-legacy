@@ -16,6 +16,13 @@ public class PacketReader extends Packet implements IPacketReader {
 	}
 
 	@Override
+	public byte[] readBytes(int val) {
+		byte[] data = new byte[val];
+		getBuffer().readBytes(data);
+		return data;
+	}
+
+	@Override
 	public short readShort() {
 		return getBuffer().readShort();
 	}

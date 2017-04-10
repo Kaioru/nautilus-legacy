@@ -4,6 +4,8 @@ public interface IPacketReader extends IPacket {
 
 	byte readByte();
 
+	byte[] readBytes(int val);
+
 	short readShort();
 
 	int readInt();
