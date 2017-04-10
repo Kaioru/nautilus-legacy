@@ -1,12 +1,12 @@
 package co.kaioru.nautilus.channel.handler.user;
 
+import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
 
 import java.awt.*;
 
-public class UserMoveHandler implements IPacketHandler {
+public class UserMoveHandler implements IServerPacketHandler {
 
 	@Override
 	public void handle(RemoteUser user, IPacketReader reader) {

@@ -1,9 +1,9 @@
 package co.kaioru.nautilus.server.packet;
 
+import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 
-@FunctionalInterface
-public interface IPacketHandler {
+public interface IServerPacketHandler {
 
 	default boolean validate(RemoteUser user) {
 		return true;

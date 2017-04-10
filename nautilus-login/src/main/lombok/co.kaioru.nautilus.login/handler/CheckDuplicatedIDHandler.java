@@ -1,11 +1,11 @@
 package co.kaioru.nautilus.login.handler;
 
+import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.orm.account.Character_;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
 import lombok.Getter;
 
 import javax.persistence.EntityManager;
@@ -14,7 +14,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.function.BiPredicate;
 
-public class CheckDuplicatedIDHandler implements IPacketHandler {
+public class CheckDuplicatedIDHandler implements IServerPacketHandler {
 
 	@Getter
 	private static final BiPredicate<EntityManager, String> predicate = (em, name) -> {

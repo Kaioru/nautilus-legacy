@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.login.handler;
 
+import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Account;
@@ -8,8 +9,7 @@ import co.kaioru.nautilus.orm.account.Account_;
 import co.kaioru.nautilus.orm.auth.IAuthenticator;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.migration.ServerMigration;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -20,7 +20,7 @@ import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-public class CheckPasswordHandler implements IPacketHandler {
+public class CheckPasswordHandler implements IServerPacketHandler {
 
 	private final EntityManager entityManager;
 	private final IAuthenticator authenticator;

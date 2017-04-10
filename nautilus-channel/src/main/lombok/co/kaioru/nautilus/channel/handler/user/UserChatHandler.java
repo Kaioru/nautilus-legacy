@@ -3,12 +3,12 @@ package co.kaioru.nautilus.channel.handler.user;
 import co.kaioru.nautilus.channel.ChannelServerApplication;
 import co.kaioru.nautilus.channel.field.object.UserFieldObject;
 import co.kaioru.nautilus.core.command.CommandRegistry;
+import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
 import co.kaioru.retort.util.CommandUtil;
 
-public class UserChatHandler implements IPacketHandler {
+public class UserChatHandler implements IServerPacketHandler {
 
 	@Override
 	public void handle(RemoteUser user, IPacketReader reader) {

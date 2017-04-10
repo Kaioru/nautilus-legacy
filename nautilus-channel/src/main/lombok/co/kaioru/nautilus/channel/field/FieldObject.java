@@ -4,7 +4,7 @@ import co.kaioru.nautilus.channel.field.object.UserFieldObject;
 import co.kaioru.nautilus.core.field.IFieldInstance;
 import co.kaioru.nautilus.core.field.IFieldObject;
 import co.kaioru.nautilus.core.field.IFieldSplit;
-import co.kaioru.nautilus.server.packet.IPacket;
+import co.kaioru.nautilus.core.packet.IPacket;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;

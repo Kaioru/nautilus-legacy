@@ -1,12 +1,12 @@
 package co.kaioru.nautilus.server.game.user;
 
+import co.kaioru.nautilus.core.packet.IPacket;
+import co.kaioru.nautilus.core.packet.IPacketWriter;
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.server.IServer;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
-import co.kaioru.nautilus.server.packet.IPacket;
-import co.kaioru.nautilus.server.packet.IPacketWriter;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import lombok.AccessLevel;
@@ -43,10 +43,6 @@ public abstract class RemoteUser extends User {
 
 	public void sendPacket(IPacket packet) {
 		getChannel().writeAndFlush(packet);
-	}
-
-	public void sendPacket(IPacketWriter writer) {
-		writer.buildAndFlush(getChannel());
 	}
 
 }

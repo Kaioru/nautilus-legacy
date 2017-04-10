@@ -4,9 +4,7 @@ import org.junit.Test;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;

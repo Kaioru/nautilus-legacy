@@ -1,10 +1,10 @@
 package co.kaioru.nautilus.channel.packet;
 
 import co.kaioru.nautilus.channel.util.TimeUtil;
+import co.kaioru.nautilus.core.packet.IPacket;
+import co.kaioru.nautilus.core.packet.PacketBuilder;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacket;
-import co.kaioru.nautilus.server.packet.PacketBuilder;
 
 import java.rmi.RemoteException;
 import java.time.Instant;
@@ -16,8 +16,8 @@ public class UserStructures {
 
 		return PacketBuilder.create(UserSendOperations.SET_FIELD)
 			.writeInt(user.getChannelServer().getConfig().getId())
-			.writeBool(true)
-			.writeBool(true)
+			.writeBoolean(true)
+			.writeBoolean(true)
 
 			.writeShort(0)
 
@@ -77,7 +77,7 @@ public class UserStructures {
 
 			.writeShort(0)
 			.writeShort(0)
-			.writeBool(false)
+			.writeBoolean(false)
 			.writeByte(0x00)
 			.writeShort(0)
 
@@ -103,9 +103,9 @@ public class UserStructures {
 	public static IPacket getUserChat(int fieldObjectId, String message, boolean gm, boolean show) {
 		return PacketBuilder.create(UserSendOperations.USER_CHAT)
 			.writeInt(fieldObjectId)
-			.writeBool(gm)
+			.writeBoolean(gm)
 			.writeString(message)
-			.writeBool(show)
+			.writeBoolean(show)
 			.build();
 	}
 

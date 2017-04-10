@@ -7,15 +7,15 @@ import co.kaioru.nautilus.server.IDaemon;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
+import co.kaioru.nautilus.core.packet.IPacketReader;
 
 import java.net.InetAddress;
 import java.rmi.RemoteException;
 import java.util.NoSuchElementException;
 import java.util.function.BiPredicate;
 
-public class SelectCharacterByVACHandler implements IPacketHandler {
+public class SelectCharacterByVACHandler implements IServerPacketHandler {
 
 	@Override
 	public void handle(RemoteUser user, IPacketReader reader) {

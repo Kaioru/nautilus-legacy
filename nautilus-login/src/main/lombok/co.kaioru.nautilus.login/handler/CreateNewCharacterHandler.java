@@ -4,12 +4,12 @@ import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Account;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
+import co.kaioru.nautilus.core.packet.IPacketReader;
 
 import javax.persistence.EntityManager;
 
-public class CreateNewCharacterHandler implements IPacketHandler {
+public class CreateNewCharacterHandler implements IServerPacketHandler {
 
 	private final EntityManager entityManager;
 

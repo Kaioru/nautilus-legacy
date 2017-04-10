@@ -4,8 +4,8 @@ import co.kaioru.nautilus.login.LoginServerApplication;
 import co.kaioru.nautilus.login.packet.LoginStructures;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
-import co.kaioru.nautilus.server.packet.IPacketHandler;
-import co.kaioru.nautilus.server.packet.IPacketReader;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
+import co.kaioru.nautilus.core.packet.IPacketReader;
 import com.google.common.collect.Maps;
 
 import java.rmi.RemoteException;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ViewAllCharHandler implements IPacketHandler {
+public class ViewAllCharHandler implements IServerPacketHandler {
 
 	@Override
 	public void handle(RemoteUser user, IPacketReader reader) {

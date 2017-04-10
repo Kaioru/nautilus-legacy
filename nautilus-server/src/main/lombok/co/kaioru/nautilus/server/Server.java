@@ -1,7 +1,8 @@
 package co.kaioru.nautilus.server;
 
+import co.kaioru.nautilus.core.packet.IPacketReader;
+import co.kaioru.nautilus.core.packet.PacketBuilder;
 import co.kaioru.nautilus.core.util.IValue;
-import co.kaioru.nautilus.crypto.ICrypto;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
@@ -11,7 +12,9 @@ import co.kaioru.nautilus.server.game.user.IRemoteUserFactory;
 import co.kaioru.nautilus.server.game.user.RemoteUser;
 import co.kaioru.nautilus.server.migration.IServerMigration;
 import co.kaioru.nautilus.server.migration.ServerMigration;
-import co.kaioru.nautilus.server.packet.*;
+import co.kaioru.nautilus.server.packet.IServerPacketHandler;
+import co.kaioru.nautilus.server.packet.ServerPacketDecoder;
+import co.kaioru.nautilus.server.packet.ServerPacketEncoder;
 import co.kaioru.nautilus.server.packet.game.SocketRecvOperations;
 import co.kaioru.nautilus.server.packet.handler.AliveAckHandler;
 import co.kaioru.nautilus.server.task.ShardHeartbeatTask;
@@ -45,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class Server<C extends ICluster, CO extends ServerConfig> extends Shard<C, CO> implements IServer<C, CO> {
 
 	private final IRemoteUserFactory remoteUserFactory;
-	private final Map<Integer, IPacketHandler> handlers;
+	private final Map<Integer, IServerPacketHandler> handlers;
 	private final Set<IServerMigration> migrations;
 
 	private Channel channel;
@@ -66,7 +69,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 			short majorVersion = getConfig().getMapleMajorVersion();
 			short minorVersion = getConfig().getMapleMinorVersion();
-			ICrypto crypto = new ShandaCrypto();
+			ShandaCrypto shandaCrypto = new ShandaCrypto();
 
 			this.channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 			this.bossGroup = new NioEventLoopGroup(2);
@@ -92,7 +95,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 					@Override
 					protected void initChannel(SocketChannel socketChannel) throws Exception {
 						socketChannel.pipeline().addLast(
-							new PacketDecoder(crypto),
+							new ServerPacketDecoder(shandaCrypto),
 							new ChannelInboundHandlerAdapter() {
 
 								@Override
@@ -102,13 +105,13 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									Channel channel = ctx.channel();
 									RemoteUser user = remoteUserFactory.create(channel);
 
-									PacketBuilder.create(0x0E)
+									channel.writeAndFlush(PacketBuilder.create(0x0E)
 										.writeShort(majorVersion)
 										.writeString(String.valueOf(minorVersion))
 										.writeBytes(riv)
 										.writeBytes(siv)
 										.writeByte((byte) 8)
-										.buildAndFlush(channel);
+										.build());
 
 									channelGroup.add(channel);
 									channel.attr(RemoteUser.USER_KEY).set(user);
@@ -131,11 +134,11 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 
 								@Override
 								public void channelRead(ChannelHandlerContext ctx, Object msg) {
-									IPacketReader reader = new PacketReader((Packet) msg);
+									IPacketReader reader = (IPacketReader) msg;
 									RemoteUser user = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
 									int operation = reader.readShort();
-									IPacketHandler handler = handlers.get(operation);
+									IServerPacketHandler handler = handlers.get(operation);
 
 									if (handler != null) {
 										if (handler.validate(user))
@@ -149,7 +152,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 								}
 
 							},
-							new PacketEncoder(crypto)
+							new ServerPacketEncoder(shandaCrypto)
 						);
 					}
 
@@ -178,11 +181,11 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 		}
 	}
 
-	public void registerPacketHandler(IValue<Integer> operation, IPacketHandler handler) {
+	public void registerPacketHandler(IValue<Integer> operation, IServerPacketHandler handler) {
 		handlers.put(operation.getValue(), handler);
 	}
 
-	public void deregisterPacketHandler(IPacketHandler handler) {
+	public void deregisterPacketHandler(IServerPacketHandler handler) {
 		handlers.remove(handler);
 	}
 

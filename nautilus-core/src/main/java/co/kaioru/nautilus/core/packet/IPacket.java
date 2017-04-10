@@ -1,4 +1,4 @@
-package co.kaioru.nautilus.server.packet;
+package co.kaioru.nautilus.core.packet;
 
 public interface IPacket {
 

@@ -1,6 +1,6 @@
-package co.kaioru.nautilus.server.packet;
+package co.kaioru.nautilus.core.packet;
 
-public interface IPacketReader {
+public interface IPacketReader extends IPacket {
 
 	byte readByte();
 

@@ -1,14 +1,14 @@
 package co.kaioru.nautilus.login.packet;
 
+import co.kaioru.nautilus.core.packet.IPacket;
+import co.kaioru.nautilus.core.packet.IPacketWriter;
+import co.kaioru.nautilus.core.packet.PacketBuilder;
 import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.orm.account.Account;
 import co.kaioru.nautilus.orm.account.Character;
 import co.kaioru.nautilus.server.game.IChannelServer;
 import co.kaioru.nautilus.server.game.IWorldCluster;
 import co.kaioru.nautilus.server.game.config.WorldConfig;
-import co.kaioru.nautilus.server.packet.IPacket;
-import co.kaioru.nautilus.server.packet.IPacketWriter;
-import co.kaioru.nautilus.server.packet.PacketBuilder;
 
 import java.net.InetAddress;
 import java.rmi.RemoteException;
@@ -40,7 +40,7 @@ public class LoginStructures {
 
 			.writeInt(account.getId())
 			.writeByte(0) // Gender
-			.writeBool(false) // GM?
+			.writeBoolean(false) // GM?
 			.writeByte(0) // GM?
 			.writeString(String.valueOf(account.getIdentity())) // TODO: Account name
 			.writeByte(0)
@@ -110,7 +110,7 @@ public class LoginStructures {
 		appendCharacterStats(writer, character);
 		appendCharacterLooks(writer, character);
 
-		writer.writeBool(rank);
+		writer.writeBoolean(rank);
 		if (rank) {
 			writer
 				.writeInt(0)
@@ -157,7 +157,7 @@ public class LoginStructures {
 			.writeByte(character.getGender())
 			.writeByte(character.getSkin())
 			.writeInt(character.getFace())
-			.writeBool(false)
+			.writeBoolean(false)
 			.writeInt(character.getHair())
 
 			.writeByte(0xFF)
@@ -169,7 +169,7 @@ public class LoginStructures {
 
 	public static IPacket getViewAllCharResultStart(int count) {
 		return PacketBuilder.create(LoginSendOperations.VIEW_ALL_CHAR_RESULT)
-			.writeBool(true)
+			.writeBoolean(true)
 			.writeInt(count)
 			.writeInt(count + (3 - count % 3))
 			.build();
@@ -177,7 +177,7 @@ public class LoginStructures {
 
 	public static IPacket getViewAllCharResult(int world, List<Character> characters) {
 		return PacketBuilder.create(LoginSendOperations.VIEW_ALL_CHAR_RESULT)
-			.writeBool(false)
+			.writeBoolean(false)
 			.writeByte(world)
 			.writeByte(characters.size())
 			.write(builder -> characters
@@ -187,7 +187,7 @@ public class LoginStructures {
 
 	public static IPacket getSelectWorldSuccess(List<Character> characters) {
 		return PacketBuilder.create(LoginSendOperations.SELECT_WORLD_RESULT)
-			.writeBool(false)
+			.writeBoolean(false)
 			.writeByte(characters.size())
 			.write(builder -> characters
 				.forEach(character -> appendCharacterEntry(builder, character, true)))
@@ -204,13 +204,13 @@ public class LoginStructures {
 
 	public static IPacket getCreateNewCharacterFailed() {
 		return PacketBuilder.create(LoginSendOperations.CREATE_NEW_CHARACTER_RESULT)
-			.writeBool(true)
+			.writeBoolean(true)
 			.build();
 	}
 
 	public static IPacket getCreateNewCharacterSuccess(Character character) {
 		return PacketBuilder.create(LoginSendOperations.CREATE_NEW_CHARACTER_RESULT)
-			.writeBool(false)
+			.writeBoolean(false)
 			.write(builder -> appendCharacterEntry(builder, character, false))
 			.build();
 	}
