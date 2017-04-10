@@ -28,16 +28,16 @@ import java.util.Map;
 
 @Getter
 @Slf4j
-public class Client extends User implements IReceiver<Client, IClientPacketHandler>, Runnable {
+public class Client<CO extends ClientConfig> extends User implements IReceiver<Client, IClientPacketHandler>, Runnable {
 
-	private final ClientConfig config;
+	private final CO config;
 	private final Map<Integer, IClientPacketHandler> packetHandlers;
 
 	private Channel channel;
 	private ShandaCrypto shandaCrypto;
 	private MapleCrypto sendCrypto, recvCrypto;
 
-	public Client(ClientConfig config) {
+	public Client(CO config) {
 		this.config = config;
 		this.packetHandlers = Maps.newConcurrentMap();
 	}
@@ -55,7 +55,7 @@ public class Client extends User implements IReceiver<Client, IClientPacketHandl
 				buffer.writeByte(i);
 				buffer.writeBytes(new byte[3]);
 			}
-			
+
 			Cipher cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
 			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"));
 
