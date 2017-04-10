@@ -2,7 +2,6 @@ package co.kaioru.nautilus.server;
 
 import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.core.packet.PacketBuilder;
-import co.kaioru.nautilus.core.util.IValue;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import co.kaioru.nautilus.server.config.ServerConfig;
@@ -48,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class Server<C extends ICluster, CO extends ServerConfig> extends Shard<C, CO> implements IServer<C, CO> {
 
 	private final IRemoteUserFactory remoteUserFactory;
-	private final Map<Integer, IServerPacketHandler> handlers;
+	private final Map<Integer, IServerPacketHandler> packetHandlers;
 	private final Set<IServerMigration> migrations;
 
 	private Channel channel;
@@ -58,7 +57,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 	public Server(CO config, IRemoteUserFactory remoteUserFactory, EntityManagerFactory entityManagerFactory) {
 		super(config, entityManagerFactory);
 		this.remoteUserFactory = remoteUserFactory;
-		this.handlers = Maps.newConcurrentMap();
+		this.packetHandlers = Maps.newConcurrentMap();
 		this.migrations = Sets.newConcurrentHashSet();
 	}
 
@@ -137,18 +136,7 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 									IPacketReader reader = (IPacketReader) msg;
 									RemoteUser user = ctx.channel().attr(RemoteUser.USER_KEY).get();
 
-									int operation = reader.readShort();
-									IServerPacketHandler handler = handlers.get(operation);
-
-									if (handler != null) {
-										if (handler.validate(user))
-											handler.handle(user, reader);
-										log.debug("Handled operation code {} with {}",
-											Integer.toHexString(operation),
-											handler.getClass().getSimpleName());
-									} else {
-										log.warn("No packet handlers found for operation code {}", Integer.toHexString(operation));
-									}
+									handlePacket(user, reader);
 								}
 
 							},
@@ -179,14 +167,6 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 		} catch (GeneralSecurityException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void registerPacketHandler(IValue<Integer> operation, IServerPacketHandler handler) {
-		handlers.put(operation.getValue(), handler);
-	}
-
-	public void deregisterPacketHandler(IServerPacketHandler handler) {
-		handlers.remove(handler);
 	}
 
 	@Override

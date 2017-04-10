@@ -4,6 +4,7 @@ import co.kaioru.nautilus.client.packet.ClientPacketDecoder;
 import co.kaioru.nautilus.client.packet.ClientPacketEncoder;
 import co.kaioru.nautilus.client.packet.IClientPacketHandler;
 import co.kaioru.nautilus.core.packet.IPacketReader;
+import co.kaioru.nautilus.core.packet.IReceiver;
 import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
@@ -13,6 +14,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -21,12 +23,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 
+@Getter
 @Slf4j
-public class Client extends User implements Runnable {
+public class Client extends User implements IReceiver<Client, IClientPacketHandler>, Runnable {
 
 	private final String host;
 	private final short port;
-	private final Map<Integer, IClientPacketHandler> handlers;
+	private final Map<Integer, IClientPacketHandler> packetHandlers;
 
 	private Channel channel;
 	private ShandaCrypto shandaCrypto;
@@ -35,7 +38,7 @@ public class Client extends User implements Runnable {
 	public Client(String host, short port) {
 		this.host = host;
 		this.port = port;
-		this.handlers = Maps.newConcurrentMap();
+		this.packetHandlers = Maps.newConcurrentMap();
 	}
 
 	@Override
@@ -84,21 +87,7 @@ public class Client extends User implements Runnable {
 										sendCrypto = new MapleCrypto(cipher, majorVersion, siv);
 										recvCrypto = new MapleCrypto(cipher, majorVersion, riv);
 										log.debug("Received heartbeat from {}", channel.remoteAddress());
-									} else {
-										int operation = reader.readShort();
-										IClientPacketHandler handler = handlers.get(operation);
-
-										// TODO: duplicate code
-										if (handler != null) {
-											if (handler.validate(client))
-												handler.handle(client, reader);
-											log.debug("Handled operation code {} with {}",
-												Integer.toHexString(operation),
-												handler.getClass().getSimpleName());
-										} else {
-											log.warn("No packet handlers found for operation code {}", Integer.toHexString(operation));
-										}
-									}
+									} else handlePacket(client, reader);
 								}
 
 								@Override
