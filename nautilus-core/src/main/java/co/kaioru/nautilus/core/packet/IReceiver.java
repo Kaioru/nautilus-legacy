@@ -4,9 +4,10 @@ import co.kaioru.nautilus.core.user.User;
 import co.kaioru.nautilus.core.util.IValue;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public interface IReceiver<U extends User, T extends IPacketHandler<U>> {
+public interface IReceiver<U extends User, T extends IPacketHandler<U>> extends Serializable {
 
 	Map<Integer, T> getPacketHandlers();
 
