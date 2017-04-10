@@ -1,5 +1,6 @@
 package co.kaioru.nautilus.client;
 
+import co.kaioru.nautilus.client.config.ClientConfig;
 import co.kaioru.nautilus.client.packet.ClientPacketDecoder;
 import co.kaioru.nautilus.client.packet.ClientPacketEncoder;
 import co.kaioru.nautilus.client.packet.IClientPacketHandler;
@@ -10,6 +11,8 @@ import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
 import com.google.common.collect.Maps;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -27,17 +30,15 @@ import java.util.Map;
 @Slf4j
 public class Client extends User implements IReceiver<Client, IClientPacketHandler>, Runnable {
 
-	private final String host;
-	private final short port;
+	private final ClientConfig config;
 	private final Map<Integer, IClientPacketHandler> packetHandlers;
 
 	private Channel channel;
 	private ShandaCrypto shandaCrypto;
 	private MapleCrypto sendCrypto, recvCrypto;
 
-	public Client(String host, short port) {
-		this.host = host;
-		this.port = port;
+	public Client(ClientConfig config) {
+		this.config = config;
 		this.packetHandlers = Maps.newConcurrentMap();
 	}
 
@@ -47,17 +48,16 @@ public class Client extends User implements IReceiver<Client, IClientPacketHandl
 		Client client = this;
 
 		try {
-			byte[] key = {
-				0x13, 0x00, 0x00, 0x00,
-				0x08, 0x00, 0x00, 0x00,
-				0x06, 0x00, 0x00, 0x00,
-				(byte) 0xB4, 0x00, 0x00, 0x00,
-				0x1B, 0x00, 0x00, 0x00,
-				0x0F, 0x00, 0x00, 0x00,
-				0x33, 0x00, 0x00, 0x00,
-				0x52, 0x00, 0x00, 0x00};
+			byte[] aesKey = getConfig().getAesKey();
+			ByteBuf buffer = Unpooled.buffer(aesKey.length * 4);
+
+			for (byte i : aesKey) {
+				buffer.writeByte(i);
+				buffer.writeBytes(new byte[3]);
+			}
+			
 			Cipher cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
-			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
+			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"));
 
 			this.channel = new Bootstrap()
 				.group(group)
@@ -103,7 +103,7 @@ public class Client extends User implements IReceiver<Client, IClientPacketHandl
 				})
 				.option(ChannelOption.TCP_NODELAY, true)
 				.option(ChannelOption.SO_KEEPALIVE, true)
-				.connect(host, 8484)
+				.connect(config.getHost(), config.getPort())
 				.channel();
 		} catch (Exception e) {
 			group.shutdownGracefully();

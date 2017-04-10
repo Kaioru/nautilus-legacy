@@ -21,6 +21,8 @@ import co.kaioru.nautilus.server.task.ShardHeartbeatTask;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -75,17 +77,16 @@ public abstract class Server<C extends ICluster, CO extends ServerConfig> extend
 			this.bossGroup = new NioEventLoopGroup(2);
 			this.workerGroup = new NioEventLoopGroup(4);
 
-			byte[] key = {
-				0x13, 0x00, 0x00, 0x00,
-				0x08, 0x00, 0x00, 0x00,
-				0x06, 0x00, 0x00, 0x00,
-				(byte) 0xB4, 0x00, 0x00, 0x00,
-				0x1B, 0x00, 0x00, 0x00,
-				0x0F, 0x00, 0x00, 0x00,
-				0x33, 0x00, 0x00, 0x00,
-				0x52, 0x00, 0x00, 0x00};
+			byte[] aesKey = getConfig().getAesKey();
+			ByteBuf buffer = Unpooled.buffer(aesKey.length * 4);
+
+			for (byte i : aesKey) {
+				buffer.writeByte(i);
+				buffer.writeBytes(new byte[3]);
+			}
+
 			Cipher cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
-			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
+			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"));
 
 			this.channel = new ServerBootstrap()
 				.group(bossGroup, workerGroup)
