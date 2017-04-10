@@ -1,6 +1,7 @@
 package co.kaioru.nautilus.server;
 
 import co.kaioru.nautilus.core.packet.IPacketReader;
+import co.kaioru.nautilus.core.packet.IReceiver;
 import co.kaioru.nautilus.core.packet.PacketBuilder;
 import co.kaioru.nautilus.crypto.maple.MapleCrypto;
 import co.kaioru.nautilus.crypto.maple.ShandaCrypto;
@@ -44,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 @Getter
 @Setter
 @Slf4j
-public abstract class Server<C extends ICluster, CO extends ServerConfig> extends Shard<C, CO> implements IServer<C, CO> {
+public abstract class Server<C extends ICluster, CO extends ServerConfig> extends Shard<C, CO> implements IServer<C, CO>, IReceiver<RemoteUser, IServerPacketHandler> {
 
 	private final IRemoteUserFactory remoteUserFactory;
 	private final Map<Integer, IServerPacketHandler> packetHandlers;

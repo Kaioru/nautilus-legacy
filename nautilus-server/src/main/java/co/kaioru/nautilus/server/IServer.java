@@ -10,7 +10,7 @@ import co.kaioru.nautilus.server.packet.IServerPacketHandler;
 
 import java.rmi.RemoteException;
 
-public interface IServer<C extends ICluster, CO extends ServerConfig> extends IShard<C, CO>, IReceiver<RemoteUser, IServerPacketHandler> {
+public interface IServer<C extends ICluster, CO extends ServerConfig> extends IShard<C, CO> {
 
 	void registerMigration(IWorldCluster worldCluster, IChannelServer channelServer, int characterId) throws RemoteException;
 
