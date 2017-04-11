@@ -34,7 +34,7 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 	private final CO config;
 	private final Map<Integer, IClientPacketHandler> packetHandlers;
 
-	private Channel channel;
+	private Channel local, remote;
 	private ShandaCrypto shandaCrypto;
 	private MapleCrypto sendCrypto, recvCrypto;
 
@@ -60,7 +60,7 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 			Cipher cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
 			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"));
 
-			this.channel = new Bootstrap()
+			this.local = new Bootstrap()
 				.group(group)
 				.channel(NioSocketChannel.class)
 				.handler(new ChannelInitializer<SocketChannel>() {
@@ -70,7 +70,6 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 						socketChannel.pipeline().addLast(
 							new ClientPacketDecoder(shandaCrypto, sendCrypto),
 							new ChannelInboundHandlerAdapter() {
-
 
 								@Override
 								public void channelRead(ChannelHandlerContext ctx, Object msg) throws GeneralSecurityException {
@@ -84,10 +83,11 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 										byte[] siv = reader.readBytes(4);
 										byte[] riv = reader.readBytes(4);
 
+										remote = ctx.channel();
 										shandaCrypto = new ShandaCrypto();
 										sendCrypto = new MapleCrypto(cipher, majorVersion, siv);
 										recvCrypto = new MapleCrypto(cipher, majorVersion, riv);
-										log.debug("Received heartbeat from {}", channel.remoteAddress());
+										log.debug("Received heartbeat from {}", local.remoteAddress());
 									} else handlePacket(client, reader);
 								}
 
@@ -112,7 +112,7 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 	}
 
 	public void sendPacket(IPacket packet) {
-		this.channel.writeAndFlush(packet);
+		this.remote.writeAndFlush(packet);
 	}
 
 }
