@@ -27,4 +27,7 @@ Aaand.. you're set!
 * [Zygon (RaGEZONE)](http://forum.ragezone.com/members/515335.html) - For the Desu project which is referenced when making this project.
 * [kevintjuh93 (RaGEZONE)](http://forum.ragezone.com/members/501793.html) - For the MoopleDEV project which is referenced when making this project.
 
-This project is made for educational purposes.
+## Disclaimers
+* This software has not profitted in any way, shape or form.
+* This software is not limited to the online game stated and can be used freely as any server protocol library.
+* This software is made purely for educational purposes only.
