@@ -4,6 +4,7 @@ import co.kaioru.nautilus.client.config.ClientConfig;
 import co.kaioru.nautilus.client.packet.ClientPacketDecoder;
 import co.kaioru.nautilus.client.packet.ClientPacketEncoder;
 import co.kaioru.nautilus.client.packet.IClientPacketHandler;
+import co.kaioru.nautilus.core.packet.IPacket;
 import co.kaioru.nautilus.core.packet.IPacketReader;
 import co.kaioru.nautilus.core.packet.IReceiver;
 import co.kaioru.nautilus.core.user.User;
@@ -108,6 +109,10 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 		} catch (Exception e) {
 			group.shutdownGracefully();
 		}
+	}
+
+	public void sendPacket(IPacket packet) {
+		this.channel.writeAndFlush(packet);
 	}
 
 }
