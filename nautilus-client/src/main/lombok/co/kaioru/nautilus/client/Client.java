@@ -34,7 +34,8 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 	private final CO config;
 	private final Map<Integer, IClientPacketHandler> packetHandlers;
 
-	private Channel local, remote;
+	private Channel channel;
+	private ChannelHandlerContext context;
 	private ShandaCrypto shandaCrypto;
 	private MapleCrypto sendCrypto, recvCrypto;
 
@@ -60,7 +61,7 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 			Cipher cipher = Cipher.getInstance("AES", new BouncyCastleProvider());
 			cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(buffer.array(), "AES"));
 
-			this.local = new Bootstrap()
+			this.channel = new Bootstrap()
 				.group(group)
 				.channel(NioSocketChannel.class)
 				.handler(new ChannelInitializer<SocketChannel>() {
@@ -83,11 +84,11 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 										byte[] siv = reader.readBytes(4);
 										byte[] riv = reader.readBytes(4);
 
-										remote = ctx.channel();
+										context = ctx;
 										shandaCrypto = new ShandaCrypto();
 										sendCrypto = new MapleCrypto(cipher, majorVersion, siv);
 										recvCrypto = new MapleCrypto(cipher, majorVersion, riv);
-										log.debug("Received heartbeat from {}", local.remoteAddress());
+										log.debug("Received heartbeat from {}", channel.remoteAddress());
 									} else handlePacket(client, reader);
 								}
 
@@ -112,7 +113,7 @@ public class Client<CO extends ClientConfig> extends User implements IReceiver<C
 	}
 
 	public void sendPacket(IPacket packet) {
-		this.remote.writeAndFlush(packet);
+		this.context.writeAndFlush(packet);
 	}
 
 }
