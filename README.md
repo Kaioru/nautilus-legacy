@@ -1,5 +1,5 @@
 # Nautilus [![CircleCI](https://circleci.com/gh/Kaioru/nautilus.svg?style=shield&circle-token=a552425db0e34ff7d0d696b421389cc25614b5d6)](https://circleci.com/gh/Kaioru/nautilus)
-Nautilus is a modular server emulator for a certain online game.
+Nautilus is a modular server emulator.
 
 ## Features
 **Distributed** - Nautilus makes use of Java's RMI API to have a distributed architecture which allows server administrators to easily scale the service depending on the load.
@@ -29,5 +29,7 @@ Aaand.. you're set!
 
 ## Disclaimers
 * This software has not profitted in any way, shape or form.
-* This software is not limited to the online game stated and can be used freely as any server protocol library.
 * This software is made purely for educational purposes only.
+* This software is not limited to the stated game and can be used freely as any server protocol library.
+
+No EULA's and ToS's were meant to be violated. Please contact the author if so and will be dealt with asap. 
