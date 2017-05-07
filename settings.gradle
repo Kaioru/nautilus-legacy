@@ -1,2 +1,4 @@
 rootProject.name = 'nautilus'
+include 'nautilus-data'
+include 'nautilus-data:data-nx'
 
