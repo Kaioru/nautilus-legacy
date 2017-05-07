@@ -1,32 +1,33 @@
-# Created by https://www.gitignore.io/api/intellij,maven
+# Created by https://www.gitignore.io/api/intellij,gradle
 
 ### Intellij ###
 .idea/
 *.iml
 
-### Maven ###
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
+### Gradle ###
+.gradle
+/build/
+*/build/
 
-# Exclude maven wrapper
-!/.mvn/wrapper/maven-wrapper.jar
+# Ignore Gradle GUI config
+gradle-app.setting
 
-# End of https://www.gitignore.io/api/intellij,maven
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties
+
+# End of https://www.gitignore.io/api/intellij,gradle
 
 ### Nautilus ###
 /lib/
-*.wz
 *.nx
+*.wz
 *.bin
-*.yaml
 *.json
-*.properties
 !*.example.*
 !*.test.*
