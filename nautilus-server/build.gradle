@@ -1,0 +1,4 @@
+dependencies {
+	compile "com.github.barakb:asyncrmi:1.0.3"
+	compile "io.netty:netty-all:4.1.11.Final"
+}
