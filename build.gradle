@@ -19,20 +19,14 @@ allprojects {
 
 	dependencies {
 		compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-		compile "com.google.dagger:dagger:$dagger_version"
-		kapt "com.google.dagger:dagger-compiler:$dagger_version"
-		compile "io.github.microutils:kotlin-logging:$kotlin_logging_version"
-		testCompile "org.slf4j:slf4j-simple:$slf4j_simple_version"
-		testCompile "junit:junit:$junit_version"
+		compile "io.github.microutils:kotlin-logging:1.4.4"
+		testCompile "org.slf4j:slf4j-simple:1.7.25"
+		testCompile "junit:junit:4.12"
 	}
 }
 
 buildscript {
 	ext.kotlin_version = '1.1.2-2'
-	ext.dagger_version = '2.10'
-	ext.kotlin_logging_version = '1.4.4'
-	ext.slf4j_simple_version = '1.7.25'
-	ext.junit_version = '4.12'
 
 	repositories {
 		mavenCentral()
