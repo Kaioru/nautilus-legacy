@@ -25,15 +25,19 @@ constructor(
 	var channel: Channel? = null
 
 	override fun run() {
-		channel = ServerBootstrap()
-			.group(parentGroup, childGroup)
-			.channel(NioServerSocketChannel::class.java)
-			.childHandler(initializer)
-			.childOption(ChannelOption.TCP_NODELAY, true)
-			.childOption(ChannelOption.SO_KEEPALIVE, true)
-			.bind(host, port)
-			.channel()
+		try {
+			channel = ServerBootstrap()
+				.group(parentGroup, childGroup)
+				.channel(NioServerSocketChannel::class.java)
+				.childHandler(initializer)
+				.childOption(ChannelOption.TCP_NODELAY, true)
+				.childOption(ChannelOption.SO_KEEPALIVE, true)
+				.bind(host, port)
+				.channel()
 
-		logger.info { "Server started on $host:$port" }
+			logger.info { "Server started on $host:$port" }
+		} catch (e: Exception) {
+			logger.error { "Server failed to start on $host:$port" }
+		}
 	}
 }

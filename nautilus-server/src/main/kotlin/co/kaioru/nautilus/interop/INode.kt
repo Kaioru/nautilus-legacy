@@ -7,4 +7,6 @@ import java.rmi.RemoteException
 interface INode<out I : NodeInfo> : Runnable, Remote {
 	val info: I
 		@Throws(RemoteException::class) get
+
+	fun ping() {}
 }
