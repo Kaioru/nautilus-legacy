@@ -1,4 +1,5 @@
 rootProject.name = 'nautilus'
 include 'nautilus-client'
 include 'nautilus-server'
+include 'nautilus-data'
 
