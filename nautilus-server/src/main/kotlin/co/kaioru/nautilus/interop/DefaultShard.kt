@@ -10,11 +10,23 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 open class DefaultShard<out I : ShardInfo, C : ICluster<*>>(
-	override val clusters: MutableCollection<C>,
+	override val clusters: MutableCollection<C> = HashSet(),
 	override val info: I,
 	open val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(8)
-) : IShard<I, C> {
+) : Runnable, IShard<I, C> {
 	companion object : KLogging()
+
+	override fun registerCluster(cluster: C) {
+		clusters.add(cluster)
+		cluster.registerShard(this)
+		logger.info { "Registered Cluster ${cluster.info.name} to registry" }
+	}
+
+	override fun deregisterCluster(cluster: C) {
+		clusters.remove(cluster)
+		cluster.deregisterShard(this)
+		logger.info { "Deregistered Cluster ${cluster.info.name} to registry" }
+	}
 
 	override fun run() {
 		val stub = UnicastRemoteObject.exportObject(this, 0)
@@ -28,11 +40,8 @@ open class DefaultShard<out I : ShardInfo, C : ICluster<*>>(
 					@Suppress("UNCHECKED_CAST")
 					val remote = registry.lookup(it.name) as C
 
-					if (!clusters.contains(remote)) {
-						registry.rebind(info.name, stub)
-						remote.shards.add(this)
-						clusters.add(remote)
-					}
+					if (!clusters.contains(remote))
+						registerCluster(remote)
 				} catch (e: Exception) {
 					logger.warn { "Failed to register Cluster ${it.name}" }
 				}

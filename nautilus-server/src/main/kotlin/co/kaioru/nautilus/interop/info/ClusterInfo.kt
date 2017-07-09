@@ -6,8 +6,7 @@ open class ClusterInfo(
 	override var name: String,
 	override var uuid: UUID,
 	override var host: String,
-	override var port: Int,
-	open val shards: MutableCollection<NodeInfo>
+	override var port: Int
 ) : NodeInfo(
 	name = name,
 	uuid = uuid,
