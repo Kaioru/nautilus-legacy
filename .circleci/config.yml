@@ -7,7 +7,7 @@ jobs:
     docker:
       - image: circleci/openjdk:8-jdk-browsers
 
-	steps:
+    steps:
       - checkout
 	  - run:
           name: Download Dependencies
