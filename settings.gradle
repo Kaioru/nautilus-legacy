@@ -1,0 +1,5 @@
+rootProject.name = 'nautilus'
+include 'nautilus-core'
+include 'nautilus-maple'
+include 'nautilus-server'
+
