@@ -1,3 +1,5 @@
 dependencies {
 	compile project(":nautilus-core")
+	compile 'com.github.aatxe:pkgnx:3.0.1'
+	compile 'com.esotericsoftware:kyro:4.0.1'
 }
