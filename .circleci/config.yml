@@ -14,4 +14,4 @@ jobs:
           command: ./gradlew dependencies
       - run:
           name: Run Tests
-          command: ./gradlew lint test
+          command: ./gradlew test
