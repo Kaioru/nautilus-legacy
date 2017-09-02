@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+
+    working_directory: ~/nautilus
+
+    docker:
+      - image: circleci/openjdk:8-jdk-browsers
+
+	steps:
+      - checkout
+	  - run:
+          name: Download Dependencies
+          command: ./gradlew dependencies
+	  - run:
+          name: Run Tests
+          command: ./gradlew lint test
