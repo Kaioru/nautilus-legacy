@@ -9,9 +9,9 @@ jobs:
 
     steps:
       - checkout
-	  - run:
+      - run:
           name: Download Dependencies
           command: ./gradlew dependencies
-	  - run:
+      - run:
           name: Run Tests
           command: ./gradlew lint test
